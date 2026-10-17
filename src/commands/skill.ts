@@ -173,20 +173,23 @@ export async function skillCompileCommand(
       }
     }
 
-    // Display summary of generated files
-    const fileList = result.files
-      .map((f) => `  • ${pc.bold(pc.white(f.relativePath))} (${pc.dim(f.description)})`)
-      .join('\n');
+    const firstTool = result.skill.tools[0]?.name || result.skill.name;
+    const targetSummary = 'Antigravity, MCP, OpenCode, Hermes, Claude Code, Goose, OpenHands, Cursor';
 
     p.note(
-      `Skill Name:   ${pc.cyan(result.skill.name)} (v${result.skill.version})\n` +
-        `Tools:        ${pc.yellow(String(result.skill.tools.length))} discovered\n` +
-        `Output Dir:   ${pc.dim(outDir)}\n\n` +
-        `Generated Artifacts:\n${fileList}`,
-      'Skill Build Summary'
+      `Skill:    ${pc.cyan(result.skill.name)} (v${result.skill.version})\n` +
+        `Tools:    ${pc.yellow(String(result.skill.tools.length))} discovered\n` +
+        `Risk:     ${pc.yellow(result.skill.tools[0]?.riskLevel || 'read_only')}\n` +
+        `Location: ${pc.dim(outDir)}\n` +
+        `Targets:  ${pc.white(targetSummary)}\n\n` +
+        pc.bold('How to use this skill now:\n') +
+        `  1. Route task directly:   ${pc.green(`vibe route "${firstTool}"`)}\n` +
+        `  2. Install into AI agent: ${pc.green(`vibe skill install ${outDir}`)}\n` +
+        `  3. Run security tests:    ${pc.green(`vibe skill test ${outDir}`)}`,
+      'Skill Compiled'
     );
 
-    p.outro(pc.green(`✔ Skill ready! Wire to Antigravity, Claude Desktop, or Cursor agents.`));
+    p.outro(pc.green('Skill ready to use.'));
   } catch (err: any) {
     s.stop(pc.red('Compilation failed.'));
     p.log.error(err.message);
@@ -245,15 +248,22 @@ export async function skillCreateCommand(
       await registerSkillInVault(vaultDir, result.skill.name, options.target || 'all', result.skill.tools);
     }
 
+    const firstTool = result.skill.tools[0]?.name || result.skill.name;
+    const targetSummary = 'Antigravity, MCP, OpenCode, Hermes, Claude Code, Goose, OpenHands, Cursor';
+
     p.note(
-      `Name:        ${pc.cyan(result.skill.name)}\n` +
-        `Risk:        ${pc.yellow(result.skill.tools[0]?.riskLevel || 'read_only')}\n` +
-        `Location:    ${pc.dim(outDir)}\n` +
-        `Files:       ${result.files.map((f) => f.relativePath).join(', ')}`,
-      'Generated Skill Package'
+      `Skill:    ${pc.cyan(result.skill.name)}\n` +
+        `Risk:     ${pc.yellow(result.skill.tools[0]?.riskLevel || 'read_only')}\n` +
+        `Location: ${pc.dim(outDir)}\n` +
+        `Targets:  ${pc.white(targetSummary)}\n\n` +
+        pc.bold('How to use this skill now:\n') +
+        `  1. Route task directly:   ${pc.green(`vibe route "${firstTool}"`)}\n` +
+        `  2. Install into AI agent: ${pc.green(`vibe skill install ${outDir}`)}\n` +
+        `  3. Run security tests:    ${pc.green(`vibe skill test ${outDir}`)}`,
+      'Skill Created'
     );
 
-    p.outro(pc.green('✔ Multi-target AI agent skill generated with deterministic safety!'));
+    p.outro(pc.green('Skill ready to use.'));
   } catch (err: any) {
     s.stop(pc.red('Synthesis failed.'));
     p.log.error(err.message);

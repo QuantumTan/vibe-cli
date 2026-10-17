@@ -219,9 +219,26 @@ Now `vibe` is globally accessible anywhere in your terminal!
 
 ## 📖 How to Use `vibe-cli`
 
+### ⚡ Quick Cheat Sheet (Start Here)
+
+| If you want to... | Just run this command: | What happens: |
+| :--- | :--- | :--- |
+| **Start using Vibe** | `vibe` | Opens the persistent interactive dashboard (stays open until you choose Exit). |
+| **Connect project to Obsidian** | `vibe link` | Auto-detects your tech stack, connects `.vault/`, and generates `AGENTS.md`. |
+| **Run your app** | `vibe dev` | Automatically starts the right dev server (Next.js, Vite, .NET, Laravel, etc.). |
+| **Verify your code** | `vibe check` | Runs build, tests, and linter to make sure everything passes. |
+| **Fix a build error with AI** | `vibe triage` | Captures compiler errors, extracts broken code line, and copies a surgical AI fix prompt. |
+| **Save a lesson or gotcha** | `vibe snap "lesson"` | Saves the bug fix or learning straight into your Obsidian Memory Bank. |
+| **Turn scripts into AI tools** | `vibe skill create "intent"` | Synthesizes an AI tool from plain English for Antigravity, OpenCode, Hermes, Claude, and Cursor. |
+| **Route a task to an AI tool** | `vibe route "task"` | Dispatches your natural language request to matching custom skills. |
+| **Clean up context at end of day**| `vibe wrapup` | Archives finished tasks and trims `_Context.md` under 60 lines for fast AI tokens. |
+| **Read the complete guide** | `vibe guide` | Interactive step-by-step documentation right inside your terminal. |
+
+---
+
 ### 1. In-Terminal Interactive UI & Built-In Guides
 
-Run `vibe` with no arguments from any terminal to open the clean navigation menu:
+Run `vibe` with no arguments from any terminal to open the clean navigation menu. It remains open until you explicitly choose **Exit**:
 
 ```powershell
 vibe

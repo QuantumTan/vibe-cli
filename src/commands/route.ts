@@ -28,7 +28,7 @@ export async function routeCommand(
 
   p.intro(pc.bgCyan(pc.black(' vibe route ')) + ' ' + pc.bold('OmniRoute Universal AI Tool Gateway'));
 
-  const allTools = await discoverAllTools();
+  let allTools = await discoverAllTools();
 
   let intent = intentInput;
   if (!intent) {
@@ -42,21 +42,33 @@ export async function routeCommand(
 
       if (!p.isCancel(shouldCreate) && shouldCreate) {
         await skillCreateCommand();
+        const fresh = await discoverAllTools();
+        if (fresh.length === 0) {
+          p.outro('OmniRoute idle.');
+          return;
+        }
+        allTools = fresh;
+        const input = await p.text({
+          message: 'Skill created! Now enter task / intent to route across your skills:',
+          placeholder: 'Clean old database records and purge cache',
+          validate: (val) => (!val?.trim() ? 'Intent is required' : undefined),
+        });
+        if (p.isCancel(input)) return;
+        intent = input.trim();
+      } else {
+        p.outro('OmniRoute idle. Create a skill using `vibe skill create` or `vibe skill compile`.');
         return;
       }
+    } else {
+      const input = await p.text({
+        message: 'Enter task / intent to route across your AI skills:',
+        placeholder: 'Clean old database records and purge cache',
+        validate: (val) => (!val?.trim() ? 'Intent is required' : undefined),
+      });
 
-      p.outro('OmniRoute idle. Create a skill using `vibe skill create` or `vibe skill compile`.');
-      return;
+      if (p.isCancel(input)) return;
+      intent = input.trim();
     }
-
-    const input = await p.text({
-      message: 'Enter task / intent to route across your AI skills:',
-      placeholder: 'Clean old database records and purge cache',
-      validate: (val) => (!val?.trim() ? 'Intent is required' : undefined),
-    });
-
-    if (p.isCancel(input)) return;
-    intent = input.trim();
   }
 
   const s = p.spinner();
@@ -73,11 +85,16 @@ export async function routeCommand(
 
     if (!p.isCancel(shouldCreate) && shouldCreate) {
       await skillCreateCommand(intent);
+      allTools = await discoverAllTools();
+      if (allTools.length === 0) {
+        p.outro('OmniRoute idle.');
+        return;
+      }
+      p.log.step(pc.green('Skill ready! Proceeding with tool dispatch...'));
+    } else {
+      p.outro('OmniRoute idle. Create a skill using `vibe skill create` or `vibe skill compile`.');
       return;
     }
-
-    p.outro('OmniRoute idle. Create a skill using `vibe skill create` or `vibe skill compile`.');
-    return;
   }
 
   const matches = matchIntentToTools(intent, allTools);

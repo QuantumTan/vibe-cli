@@ -16,21 +16,29 @@ export const GUIDE_TOPICS: Record<string, GuideTopic> = {
     content: `
 ${pc.bold('First-Time Setup and Project Linking')}
 -----------------------------------------
+What it does:
+Connects your project to an Obsidian vault via NTFS directory junctions.
+AI coding agents (Antigravity, Cursor, Claude) use this live link to read
+project context, memory bank notes, and architecture decisions in real time.
 
-1. Open your terminal in any project directory:
-   cd C:\\Users\\ACER\\Documents\\Projects\\my-app
+Simple 3-Step Flow:
+  1. Open your terminal in your project directory:
+     cd C:\\Users\\ACER\\Documents\\Projects\\my-app
 
-2. Run the link command:
-   vibe link
+  2. Run the link command:
+     vibe link
+     This auto-detects your tech stack, links .vault/ to your Obsidian vault,
+     and creates AGENTS.md with strict memory rules for AI coding assistants.
 
-   vibe will auto-detect your stack (React, Next.js, .NET, Laravel, Flutter, etc.),
-   create an NTFS directory junction (.vault/) pointing to your Obsidian vault,
-   and generate AGENTS.md with strict instructions for AI coding assistants.
+  3. Start using the interactive menu:
+     vibe
 
-3. Optional flags:
-   vibe link --browse           Open a native Windows folder picker
-   vibe link --vault Work-Vault Target a specific registered vault
-   vibe scan                    Scan a parent folder to batch-link multiple projects
+Everyday Commands:
+  vibe link                    Link current project to default Obsidian vault
+  vibe link --browse           Open native Windows folder picker to choose a vault
+  vibe link --vault Work-Vault Link to a specific named vault
+  vibe scan                    Auto-discover and batch-link all projects in a directory
+  vibe init                    Create a brand-new Obsidian vault structure
 `.trim(),
   },
 
@@ -41,28 +49,33 @@ ${pc.bold('First-Time Setup and Project Linking')}
     content: `
 ${pc.bold('Daily Development Workflow')}
 ---------------------------
+What it does:
+Your daily coding loop. Keeps your local environment verified, diagnoses build
+failures instantly, and ensures hard-won lessons are remembered in your vault.
 
-Step 1: Start your development environment
-  vibe dev
-  Automatically runs the correct dev server (npm run dev, dotnet watch, artisan serve).
+Simple 3-Step Flow:
+  1. Start dev server and verify code:
+     vibe dev                  Starts dev server (npm run dev, dotnet watch, artisan serve)
+     vibe check                Runs builds, tests, and linter before making changes
 
-Step 2: Verify your changes
-  vibe check
-  Runs your project's verification suite (build, test, lint) before making commits.
+  2. Diagnose failures fast:
+     If a build or test fails, run:
+     vibe triage
+     Captures compiler error traces, isolates the broken lines with >>>,
+     pulls past lessons from your vault, and copies a surgical fix prompt to clipboard.
 
-Step 3: Triage failures if tests or builds break
-  vibe triage
-  Captures compiler and test error traces, extracts a 10-line source snippet with
-  pointer >>>, references past lessons, and copies a surgical fix prompt to your clipboard.
+  3. Save learnings and clean up:
+     vibe snap "JWT refresh token race fixed by deduplicating requests"
+     Saves the lesson directly to .vault/Memory-Bank/Lessons-and-Gotchas.md.
+     vibe wrapup
+     Archives completed tasks and trims _Context.md to under 60 lines for fast AI context.
 
-Step 4: Record learnings and gotchas
-  vibe snap "JWT refresh token race condition resolved by deduplicating refresh calls"
-  Appends the insight directly to Obsidian at Memory-Bank/Lessons-and-Gotchas.md.
-
-Step 5: End your session cleanly
-  vibe wrapup
-  Archives completed tasks from _Context.md into Memory-Bank/Archive.md and trims
-  _Context.md to under 60 lines so AI context windows stay fast and accurate.
+Everyday Commands:
+  vibe dev                     Start project dev server
+  vibe check                   Verify project health (build, test, lint)
+  vibe triage                  Analyze compiler failure and copy AI fix prompt
+  vibe snap "lesson"           Record a gotcha or learning to Obsidian
+  vibe wrapup                  Archive finished tasks and optimize context size
 `.trim(),
   },
 
@@ -73,30 +86,34 @@ Step 5: End your session cleanly
     content: `
 ${pc.bold('Feature Architecture and Specifications')}
 ---------------------------------------
+What it does:
+Locks down feature requirements before writing code, compresses codebase context
+so AI agents do not hallucinate, and protects working code with instant rollback snapshots.
 
-1. Clarify requirements before coding:
-   vibe clarify "Subscription Billing"
-   Runs an architectural interview across 5 pillars (persistence, security, failure,
-   UI profile, commercial controls) and saves a structured PRD to .vault/Specs/.
+Simple 3-Step Flow:
+  1. Clarify feature requirements:
+     vibe clarify "Subscription Billing"
+     Runs a 5-pillar architectural interview (database, security, failure modes, UI, commercial)
+     and saves a structured PRD spec in .vault/Specs/.
 
-2. Scaffold a feature specification:
-   vibe spec "Team Workspaces"
-   Generates a structured PRD template with schemas, edge cases, and test criteria.
+  2. Compress code context for AI prompts:
+     vibe pack src/ -s
+     Extracts TypeScript/Python AST signatures (types, exports, function headers)
+     without bulky function bodies, saving 70% of tokens, and copies it to clipboard.
 
-3. Feed dense codebase context to AI agents:
-   vibe pack src/api -s
-   Extracts AST signatures (exports, interfaces, function headers) without function
-   bodies, saving 70-80% of tokens, and copies the compressed context to your clipboard.
+  3. Snapshot before major AI refactoring:
+     vibe checkpoint "Before auth refactor"
+     Saves an atomic backup of modified files. If the AI breaks your code:
+     vibe rollback             Instantly reverts files to the checkpoint.
 
-4. Generate visual architecture canvas:
-   vibe canvas
-   Generates a 2D interactive .canvas whiteboard file inside Obsidian connecting
-   the project hub, tasks, database models, and memory bank notes.
-
-5. Save safety snapshots before AI refactors:
-   vibe checkpoint "Before auth rewrite"
-   Saves an atomic snapshot of modified files. If anything breaks:
-   vibe rollback
+Everyday Commands:
+  vibe clarify "Feature Name"  Interactive 5-pillar design interview and PRD generator
+  vibe spec "Feature Name"     Scaffold a PRD template with schemas and test criteria
+  vibe prompt "Task"           Generate high-precision prompt for AI coding agents
+  vibe pack src/ -s            Extract compressed AST signatures to clipboard
+  vibe canvas                  Generate interactive 2D architecture canvas in Obsidian
+  vibe checkpoint "label"      Save atomic backup of working files
+  vibe rollback                Revert modified files to last checkpoint
 `.trim(),
   },
 
@@ -107,23 +124,30 @@ ${pc.bold('Feature Architecture and Specifications')}
     content: `
 ${pc.bold('Codebase Topology and Database Schemas')}
 ---------------------------------------
+What it does:
+Scans your code, database schemas, and API endpoints, automatically generating
+visual diagrams and specifications saved directly inside your Obsidian vault.
 
-1. Extract codebase module topology:
-   vibe map
-   Scans TypeScript, Python, Dart, C#, and PHP for exported classes, functions,
-   and relative imports. Generates an interactive Mermaid dependency graph in
-   .vault/Architecture/Codebase-Map.md.
+Simple 3-Step Flow:
+  1. Visualize codebase dependencies:
+     vibe map
+     Scans imports across TypeScript, Python, Dart, C#, and PHP. Generates an
+     interactive Mermaid dependency graph in .vault/Architecture/Codebase-Map.md.
 
-2. Parse database schema:
-   vibe db
-   Parses schema.prisma, schema.sql, or migration files. Emits an entity-relationship
-   Mermaid diagram and a data dictionary in .vault/Architecture/Database-Schema.md.
+  2. Map database entity relationships:
+     vibe db
+     Parses schema.prisma, schema.sql, or migration files. Emits an ER diagram
+     and data dictionary in .vault/Architecture/Database-Schema.md.
 
-3. Export REST API documentation:
-   vibe api
-   Discovers endpoints across Express, Next.js, FastAPI, Laravel, and ASP.NET Core.
-   Outputs a standards-compliant openapi.json and .vault/Architecture/API-Reference.md
-   complete with pre-computed curl test commands.
+  3. Document REST API endpoints:
+     vibe api
+     Discovers endpoints across Express, Next.js, FastAPI, and Laravel. Outputs
+     a standards-compliant openapi.json and API reference with test curl commands.
+
+Everyday Commands:
+  vibe map                     Generate interactive Mermaid module dependency graph
+  vibe db                      Generate database ER diagram and data dictionary
+  vibe api                     Export OpenAPI 3.0 specification and curl test commands
 `.trim(),
   },
 
@@ -134,34 +158,32 @@ ${pc.bold('Codebase Topology and Database Schemas')}
     content: `
 ${pc.bold('Commercial Launch and Payments')}
 -----------------------------
+What it does:
+Audits production readiness, scaffolds Stripe payments, tests frontend resilience
+with local mock APIs, and safeguards sensitive credentials.
 
-1. Run pre-flight release checks:
-   vibe ship
-   Audits against placeholder keys, missing robots.txt, unhandled errors, and builds.
-   Auto-scaffolds GDPR/CCPA Privacy Policy and Terms of Service documents.
+Simple 3-Step Flow:
+  1. Run pre-flight release audit:
+     vibe ship
+     Audits placeholder keys, missing robots.txt, unhandled errors, and clean builds.
+     Auto-scaffolds GDPR/CCPA Privacy Policy and Terms of Service templates.
 
-2. Scaffold Stripe payments:
-   vibe monetize
-   Scaffolds Stripe Checkout endpoints, cryptographic webhook signature handlers,
-   and a React pricing table component.
+  2. Scaffold commercial Stripe billing:
+     vibe monetize
+     Scaffolds Stripe Checkout endpoints, cryptographic webhook handlers, and
+     a ready-to-use React pricing table component.
 
-3. Run zero-dependency local mock API:
-   vibe mock --port 4000 --delay 150 --chaos 0.05
-   Starts an in-memory REST API server with full CORS, latency simulation, and
-   configurable error chaos to test frontend resilience before backends are built.
+  3. Test frontend resilience before backend is ready:
+     vibe mock --port 4000 --delay 150 --chaos 0.05
+     Starts a local mock API with CORS, simulated network delay, and error chaos.
 
-4. Audit environment secrets:
-   vibe env --sync
-   Compares .env with .env.example, flags leaked live secrets (sk_live_, ghp_),
-   and automatically appends missing keys with safe placeholder values.
-
-5. Audit supply-chain dependencies:
-   vibe deps --fix
-   Scans package manifests against CVE vulnerability advisories and outdated packages.
-
-6. Commit with conventional format:
-   vibe commit
-   Analyzes git diff and drafts conventional feat(scope), fix(scope) commit messages.
+Everyday Commands:
+  vibe ship                    Audit production readiness and scaffold legal policies
+  vibe monetize                Scaffold Stripe billing, webhooks, and pricing table
+  vibe mock                    Start local zero-dependency mock REST API
+  vibe env --sync              Audit leaked live secrets and sync .env with .env.example
+  vibe deps --fix              Scan dependencies for security vulnerabilities
+  vibe commit                  Generate conventional commit messages from git diff
 `.trim(),
   },
 
@@ -172,44 +194,36 @@ ${pc.bold('Commercial Launch and Payments')}
     content: `
 ${pc.bold('Custom Skills and MCP Tool Routing')}
 ----------------------------------
+What it does:
+OmniRoute turns your scripts or natural language prompts into multi-target AI tools.
+Tools can be installed into Antigravity, OpenCode, Nous Hermes, Claude Code, Cursor,
+and Goose, or invoked directly using natural language.
 
-OmniRoute is an AI tool gateway and dispatcher. It matches your prompts to
-custom skills compiled in your Obsidian vault (.vault/Skills/) or ./skills/.
+Simple 3-Step Flow:
+  1. Create or compile a skill:
+     From natural language:
+       vibe skill create "Flush Redis cache keys matching pattern"
+     Or from an existing Python/TypeScript script:
+       vibe skill compile ./scripts/backup.py -t all
 
-Prerequisite: In a fresh project, no tools exist initially. You must compile
-or create at least one skill before routing intents.
+  2. Install into your AI agent or editor:
+     vibe skill install ./skills/flush-redis
+     Automatically configures Antigravity, OpenCode (opencode.json),
+     Nous Hermes (~/.hermes/skills/), Claude Code (.claude/mcp.json), and Cursor.
 
-1. Create a skill from natural language:
-   vibe skill create "Flush Redis cache keys matching pattern"
-   Generates tool schemas, safety guardrails, MCP server, and runner.
+  3. Route natural language tasks directly to tools:
+     vibe route "flush cache keys matching session_*"
+     OmniRoute matches your intent, validates arguments, enforces safety guardrails,
+     and executes the tool.
 
-2. Compile an existing Python or TypeScript script:
-   vibe skill compile ./scripts/backup.py -t all
-   Extracts functions, types, and docstrings into multi-target skill definitions:
-   Antigravity, MCP Server, Cursor, OpenAI, OpenCode, Nous Hermes, Goose,
-   Claude Code, OpenHands, Aider, and Continue.dev.
-
-3. Ingest OpenAPI into guarded tools:
-   vibe skill from-api ./swagger.json
-
-4. List installed skills:
-   vibe skill list
-   Shows active skills and their compilation targets.
-
-5. Test skill security sandbox:
-   vibe skill test ./skills/db-cleaner
-   Runs attack payloads testing path traversal, SSRF, and destructive write locks.
-
-6. Install skill to agent clients:
-   vibe skill install ./skills/db-cleaner
-   One-command installation into Claude Desktop, Antigravity, Cursor,
-   OpenCode (opencode.json), Nous Hermes (~/.hermes/skills/),
-   Goose (config.yaml), Claude Code (.claude/mcp.json), and OpenHands.
-
-7. Route natural language to tools:
-   vibe route "purge expired user sessions"
-   Or run as a persistent stdio MCP multiplexer for agent clients:
-   vibe route --server
+Everyday Commands:
+  vibe skill create "intent"   Synthesize AI skill from natural language description
+  vibe skill compile <file>    Compile Python/TS script into 7+ agent formats
+  vibe skill list              List discovered skills and tools
+  vibe skill test <dir>        Run security sandbox tests (path traversal, SSRF)
+  vibe skill install <dir>     Install skill into Antigravity, OpenCode, Hermes, Claude, Cursor
+  vibe route "task"            Dispatch natural language task across installed skills
+  vibe route --server          Run persistent stdio MCP multiplexer for agent clients
 `.trim(),
   },
 };

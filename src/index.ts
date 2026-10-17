@@ -83,12 +83,12 @@ export async function interactiveMainMenu(): Promise<void> {
       return;
     }
 
-    if (action === 'dev') { await devCommand(); return; }
-    if (action === 'check') { await checkCommand(); return; }
-    if (action === 'triage') { await triageCommand(); return; }
-    if (action === 'snap') { await snapCommand(); return; }
-    if (action === 'wrapup') { await wrapupCommand(); return; }
-    if (action === 'link') { await linkCommand(); return; }
+    if (action === 'dev') { await devCommand(); continue; }
+    if (action === 'check') { await checkCommand(); continue; }
+    if (action === 'triage') { await triageCommand(); continue; }
+    if (action === 'snap') { await snapCommand(); continue; }
+    if (action === 'wrapup') { await wrapupCommand(); continue; }
+    if (action === 'link') { await linkCommand(); continue; }
     if (action === 'guide') { await guideCommand(); continue; }
 
     if (action === 'ai') {
@@ -106,13 +106,13 @@ export async function interactiveMainMenu(): Promise<void> {
         ],
       });
       if (p.isCancel(sub) || sub === 'back') continue;
-      if (sub === 'clarify') { await clarifyCommand(); return; }
-      if (sub === 'spec') { await specCommand(); return; }
-      if (sub === 'prompt') { await promptCommand(); return; }
-      if (sub === 'pack') { await packCommand(); return; }
-      if (sub === 'canvas') { await canvasCommand(); return; }
-      if (sub === 'checkpoint') { await checkpointCommand(); return; }
-      if (sub === 'rollback') { await rollbackCommand(); return; }
+      if (sub === 'clarify') { await clarifyCommand(); continue; }
+      if (sub === 'spec') { await specCommand(); continue; }
+      if (sub === 'prompt') { await promptCommand(); continue; }
+      if (sub === 'pack') { await packCommand(); continue; }
+      if (sub === 'canvas') { await canvasCommand(); continue; }
+      if (sub === 'checkpoint') { await checkpointCommand(); continue; }
+      if (sub === 'rollback') { await rollbackCommand(); continue; }
     }
 
     if (action === 'topology') {
@@ -126,9 +126,9 @@ export async function interactiveMainMenu(): Promise<void> {
         ],
       });
       if (p.isCancel(sub) || sub === 'back') continue;
-      if (sub === 'map') { await mapCommand(); return; }
-      if (sub === 'db') { await dbCommand(); return; }
-      if (sub === 'api') { await apiCommand(); return; }
+      if (sub === 'map') { await mapCommand(); continue; }
+      if (sub === 'db') { await dbCommand(); continue; }
+      if (sub === 'api') { await apiCommand(); continue; }
     }
 
     if (action === 'commercial') {
@@ -146,13 +146,13 @@ export async function interactiveMainMenu(): Promise<void> {
         ],
       });
       if (p.isCancel(sub) || sub === 'back') continue;
-      if (sub === 'ship') { await shipCommand(); return; }
-      if (sub === 'monetize') { await monetizeCommand(); return; }
-      if (sub === 'mock') { await mockCommand(); return; }
-      if (sub === 'env') { await envCommand(); return; }
-      if (sub === 'commit') { await commitCommand(); return; }
-      if (sub === 'deps') { await depsCommand(); return; }
-      if (sub === 'audit') { await auditCommand(); return; }
+      if (sub === 'ship') { await shipCommand(); continue; }
+      if (sub === 'monetize') { await monetizeCommand(); continue; }
+      if (sub === 'mock') { await mockCommand(); continue; }
+      if (sub === 'env') { await envCommand(); continue; }
+      if (sub === 'commit') { await commitCommand(); continue; }
+      if (sub === 'deps') { await depsCommand(); continue; }
+      if (sub === 'audit') { await auditCommand(); continue; }
     }
 
     if (action === 'skills') {
@@ -169,10 +169,10 @@ export async function interactiveMainMenu(): Promise<void> {
         ],
       });
       if (p.isCancel(sub) || sub === 'back') continue;
-      if (sub === 'route') { await routeCommand(); return; }
-      if (sub === 'scan') { await scanCommand(); return; }
-      if (sub === 'sync') { await syncCommand(); return; }
-      if (sub === 'doctor') { await doctorCommand(); return; }
+      if (sub === 'route') { await routeCommand(); continue; }
+      if (sub === 'scan') { await scanCommand(); continue; }
+      if (sub === 'sync') { await syncCommand(); continue; }
+      if (sub === 'doctor') { await doctorCommand(); continue; }
 
       if (sub === 'vault') {
         const vaultAction = await p.select({
@@ -186,10 +186,10 @@ export async function interactiveMainMenu(): Promise<void> {
           ],
         });
         if (p.isCancel(vaultAction) || vaultAction === 'back') continue;
-        if (vaultAction === 'list') { await vaultListCommand(); return; }
-        if (vaultAction === 'create') { await vaultCreateCommand(); return; }
-        if (vaultAction === 'browse') { await vaultCreateCommand(undefined, { browse: true }); return; }
-        if (vaultAction === 'switch') { await vaultSwitchCommand(); return; }
+        if (vaultAction === 'list') { await vaultListCommand(); continue; }
+        if (vaultAction === 'create') { await vaultCreateCommand(); continue; }
+        if (vaultAction === 'browse') { await vaultCreateCommand(undefined, { browse: true }); continue; }
+        if (vaultAction === 'switch') { await vaultSwitchCommand(); continue; }
       }
 
       if (sub === 'skill') {
@@ -207,13 +207,13 @@ export async function interactiveMainMenu(): Promise<void> {
           ],
         });
         if (p.isCancel(skillAction) || skillAction === 'back') continue;
-        if (skillAction === 'compile') { await skillCompileCommand(); return; }
-        if (skillAction === 'create') { await skillCreateCommand(); return; }
-        if (skillAction === 'from-api') { await skillFromApiCommand(); return; }
-        if (skillAction === 'test') { await skillTestCommand(); return; }
-        if (skillAction === 'install') { await skillInstallCommand(); return; }
-        if (skillAction === 'audit') { await skillAuditCommand(); return; }
-        if (skillAction === 'list') { await skillListCommand(); return; }
+        if (skillAction === 'compile') { await skillCompileCommand(); continue; }
+        if (skillAction === 'create') { await skillCreateCommand(); continue; }
+        if (skillAction === 'from-api') { await skillFromApiCommand(); continue; }
+        if (skillAction === 'test') { await skillTestCommand(); continue; }
+        if (skillAction === 'install') { await skillInstallCommand(); continue; }
+        if (skillAction === 'audit') { await skillAuditCommand(); continue; }
+        if (skillAction === 'list') { await skillListCommand(); continue; }
       }
     }
   }
