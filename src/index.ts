@@ -21,6 +21,10 @@ import { specCommand } from './commands/spec.js';
 import { routeCommand } from './commands/route.js';
 import { clarifyCommand } from './commands/clarify.js';
 import { shipCommand } from './commands/ship.js';
+import { checkpointCommand, rollbackCommand } from './commands/checkpoint.js';
+import { mapCommand } from './commands/map.js';
+import { monetizeCommand } from './commands/monetize.js';
+import { mockCommand } from './commands/mock.js';
 import {
   skillCompileCommand,
   skillCreateCommand,
@@ -108,6 +112,31 @@ export async function interactiveMainMenu(): Promise<void> {
         hint: 'Universal gateway & semantic intent dispatcher for skills',
       },
       {
+        value: 'checkpoint',
+        label: '💾 Time-Machine Checkpoint (vibe checkpoint)',
+        hint: 'Instant workspace snapshot before AI edits',
+      },
+      {
+        value: 'rollback',
+        label: '⏪ Rollback Workspace (vibe rollback)',
+        hint: 'Restore workspace to previous stable checkpoint',
+      },
+      {
+        value: 'map',
+        label: '🗺️ Codebase Topology & AST Grapher (vibe map)',
+        hint: 'Extract module dependencies, exports, and API routes',
+      },
+      {
+        value: 'monetize',
+        label: '💳 Scaffold Stripe Billing (vibe monetize)',
+        hint: 'Stripe checkout, webhooks, and pricing table',
+      },
+      {
+        value: 'mock',
+        label: '🧪 Mock REST API Server (vibe mock)',
+        hint: 'Zero-dependency local HTTP API server with CORS',
+      },
+      {
         value: 'skill',
         label: '⚡ Multi-Target AI Skill Compiler (vibe skill)',
         hint: 'Compile scripts into Antigravity, MCP, Cursor & OpenAI skills',
@@ -182,6 +211,21 @@ export async function interactiveMainMenu(): Promise<void> {
       break;
     case 'route':
       await routeCommand();
+      break;
+    case 'checkpoint':
+      await checkpointCommand();
+      break;
+    case 'rollback':
+      await rollbackCommand();
+      break;
+    case 'map':
+      await mapCommand();
+      break;
+    case 'monetize':
+      await monetizeCommand();
+      break;
+    case 'mock':
+      await mockCommand();
       break;
     case 'skill': {
       const skillAction = await p.select({
@@ -530,6 +574,60 @@ program
   .action(async (intentParts, options) => {
     const intent = intentParts && intentParts.length > 0 ? intentParts.join(' ') : undefined;
     await routeCommand(intent, options);
+  });
+
+// 20. vibe checkpoint
+program
+  .command('checkpoint')
+  .description('Create an instant time-machine snapshot before AI agent edits')
+  .argument('[label...]', 'Checkpoint label or description')
+  .option('-l, --list', 'List stored checkpoints')
+  .action(async (labelParts, options) => {
+    const label = labelParts && labelParts.length > 0 ? labelParts.join(' ') : undefined;
+    await checkpointCommand(label, options);
+  });
+
+// 21. vibe rollback
+program
+  .command('rollback')
+  .description('Restore workspace files to a previous stable checkpoint')
+  .argument('[checkpointId]', 'ID of checkpoint to restore')
+  .action(async (checkpointId) => {
+    await rollbackCommand(checkpointId);
+  });
+
+// 22. vibe map
+program
+  .command('map')
+  .description('Extract codebase topology, AST exports, module dependencies, and API routes')
+  .argument('[targetDir]', 'Target project directory to analyze (defaults to current dir)')
+  .action(async (targetDir) => {
+    await mapCommand(targetDir);
+  });
+
+// 23. vibe monetize
+program
+  .command('monetize')
+  .description('Scaffold complete commercial Stripe subscriptions, webhooks, and pricing table')
+  .argument('[targetDir]', 'Target project directory to scaffold (defaults to current dir)')
+  .action(async (targetDir) => {
+    await monetizeCommand(targetDir);
+  });
+
+// 24. vibe mock
+program
+  .command('mock')
+  .description('Launch instant zero-dependency local REST mock API server with CORS and latency simulation')
+  .argument('[dataFile]', 'Optional JSON data or OpenAPI file to seed mock endpoints')
+  .option('-p, --port <port>', 'Port number to listen on', '4000')
+  .option('-d, --delay <delayMs>', 'Simulated network latency in milliseconds', '0')
+  .option('-c, --chaos <rate>', 'Chaos error simulation rate (0.0 - 1.0)', '0')
+  .action(async (dataFile, options) => {
+    await mockCommand(dataFile, {
+      port: parseInt(options.port, 10),
+      delay: parseInt(options.delay, 10),
+      chaos: parseFloat(options.chaos),
+    });
   });
 
 program.parse();

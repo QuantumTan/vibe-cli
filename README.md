@@ -119,6 +119,27 @@ The ultimate pre-flight checklist for deploying profitable, production-grade app
 * **Zero-Error Verification Gate**: Runs the project's native build and test suite (`npm run build`, `dotnet build`, etc.).
 * **Deployment Automation**: Scaffolds production multi-stage `Dockerfile` and GitHub Actions CI/CD workflows if missing.
 
+### 💾 13. Instant Time-Machine & Rollback Engine (`vibe checkpoint` & `vibe rollback`)
+Zero-risk AI coding. Snapshot working code before letting agents make complex changes:
+* **`vibe checkpoint [label]`**: Creates an atomic snapshot of modified and critical workspace files with git commit hashing in `.vault/Checkpoints/`.
+* **`vibe rollback [id]`**: 1-click restoration to any previous snapshot, instantly rescuing code from AI hallucinations or broken refactors.
+
+### 🗺️ 14. Codebase Topology & AST Grapher (`vibe map`)
+Gives AI agents deep architectural awareness of module relationships:
+* **Symbol & Route Extraction**: Scans TypeScript, Python, Dart, C#, and PHP for exported functions, classes, interfaces, relative dependencies, and REST API endpoints.
+* **Interactive Mermaid Diagrams**: Auto-generates living architectural dependency graphs in `.vault/Architecture/Codebase-Map.md` linked to Obsidian's Symbol Index.
+
+### 💳 15. Commercial Monetization Suite (`vibe monetize`)
+Scaffold revenue-generating billing infrastructure in 1 step:
+* **Stripe Checkout & Webhooks**: Scaffolds Next.js/Express API routes with cryptographic webhook signature verification (`stripe.webhooks.constructEvent`) and subscription lifecycle handlers.
+* **Pricing Table Component**: Generates a modern React `<PricingTable />` with monthly/yearly toggles, feature checklists, and checkout redirect handlers.
+* **Architecture Spec**: Generates `.vault/Specs/Monetization-Architecture.md` with Stripe CLI testing workflows.
+
+### 🧪 16. Instant Zero-Dependency Mock REST API Server (`vibe mock`)
+Develop frontends in React, Flutter, or Vue before the backend is built:
+* **Built-in Node.js HTTP Server**: Runs on port 4000 with zero external dependencies, full CORS support, and automatic in-memory CRUD operations (`GET`, `POST`, `PUT`, `DELETE`).
+* **Chaos & Network Simulation**: Simulate network latency (`--delay 200`) and chaos error rates (`--chaos 0.1` for 10% 500 responses) to stress-test UI resilience.
+
 ---
 
 ## 📦 Installation & Setup
@@ -186,6 +207,11 @@ Use `↑` / `↓` arrow keys to navigate and `Enter` to select:
 | `vibe spec [feature]` | Generates a complete PRD & feature specification in Obsidian | `vibe spec "Subscription Billing"` |
 | `vibe ship [path]` | Commercial launch gate & launchpad (secrets, GDPR legal suite, SEO, CI/CD) | `vibe ship` |
 | `vibe route [intent]` | OmniRoute AI Tool Gateway: semantic dispatcher & MCP server multiplexer | `vibe route "purge redis cache"` |
+| `vibe checkpoint [label]` | Creates an instant time-machine snapshot before AI agent edits | `vibe checkpoint "Before auth refactor"` |
+| `vibe rollback [id]` | Restores workspace files to a previous stable checkpoint | `vibe rollback` |
+| `vibe map [path]` | Extracts codebase topology, module dependencies, and API routes | `vibe map` |
+| `vibe monetize [path]` | Scaffolds complete commercial Stripe subscriptions & billing | `vibe monetize` |
+| `vibe mock [dataFile]` | Launches zero-dependency local REST mock API server with CORS | `vibe mock` |
 | `vibe dev` | Launches the auto-detected development server | `vibe dev` |
 | `vibe check` | Runs the auto-detected build/test verification suite | `vibe check` |
 | `vibe snap "<note>"` | Logs a lesson, gotcha, or decision into Obsidian Memory Bank | `vibe snap "Fixed JWT refresh race condition"` |
