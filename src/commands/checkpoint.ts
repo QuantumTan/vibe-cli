@@ -275,7 +275,7 @@ export async function rollbackCommand(checkpointIdInput?: string): Promise<void>
       message: 'Select a checkpoint to restore:',
       options: list.map((cp) => ({
         value: cp.id,
-        label: `${cp.id} — ${cp.label} (${cp.fileCount} files)`,
+        label: `${cp.id}: ${cp.label} (${cp.fileCount} files)`,
         hint: cp.timestamp.substring(0, 16).replace('T', ' '),
       })),
     });

@@ -48,7 +48,7 @@ async function registerSkillInVault(
       ? '🟡 Write'
       : '🟢 Read-Only';
 
-  const entry = `- **[[Skills/${skillName}/SKILL|${skillName}]]** — ${tools.length} tool(s) [${riskBadge}] • Target: \`${target}\``;
+  const entry = `- **[[Skills/${skillName}/SKILL|${skillName}]]**: ${tools.length} tool(s) [${riskBadge}] • Target: \`${target}\``;
 
   if (content.includes(`[[Skills/${skillName}/SKILL`)) {
     return; // Already indexed

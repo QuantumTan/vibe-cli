@@ -70,7 +70,7 @@ export async function routeCommand(
     const pick = await p.select({
       message: 'Select the tool you want OmniRoute to dispatch to:',
       options: matches.map((m) => ({
-        label: `${m.tool.toolName} (${m.tool.skillName}) — ${m.confidence.toUpperCase()} confidence`,
+        label: `${m.tool.toolName} (${m.tool.skillName}): ${m.confidence.toUpperCase()} confidence`,
         value: m,
         hint: m.tool.description,
       })),
