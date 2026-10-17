@@ -140,6 +140,32 @@ Develop frontends in React, Flutter, or Vue before the backend is built:
 * **Built-in Node.js HTTP Server**: Runs on port 4000 with zero external dependencies, full CORS support, and automatic in-memory CRUD operations (`GET`, `POST`, `PUT`, `DELETE`).
 * **Chaos & Network Simulation**: Simulate network latency (`--delay 200`) and chaos error rates (`--chaos 0.1` for 10% 500 responses) to stress-test UI resilience.
 
+### 🗄️ 17. Database & Schema Visualizer (`vibe db`)
+Keep AI agents grounded with zero database schema hallucination:
+* **Prisma & SQL Parser**: Automatically parses `schema.prisma`, `schema.sql`, or migration files into tables, fields, types, and primary/foreign key relationships.
+* **Living ER Diagrams**: Auto-generates interactive Mermaid `erDiagram` visual models and typed data dictionaries directly into `.vault/Architecture/Database-Schema.md`.
+
+### 🪶 18. Token-Optimized AI Context Packer (`vibe pack`)
+Feed dense codebase context to AI models without blowing token limits:
+* **AST Tree-Shaking**: Pass `--signatures-only` to strip function bodies and retain strictly types, interfaces, and function headers (saving 70-80% of tokens).
+* **Token Estimator & Auto-Copy**: Estimates token counts (~4 chars/token) and copies compressed context directly to the Windows Clipboard for 1-click paste into Antigravity or Cursor.
+
+### 📝 19. Semantic Conventional Commit & Changelog Engine (`vibe commit`)
+Never write lazy `"wip"` or `"fix"` commit messages again:
+* **Smart Diff Analyzer**: Analyzes staged/unstaged changes, detected file scopes, additions, and deletions.
+* **Conventional Commit Synthesis**: Generates crisp `feat(scope): ...`, `fix(scope): ...`, `test(scope): ...` proposals.
+* **Living Changelog**: Automatically updates `.vault/Changelog.md` and root `CHANGELOG.md` upon confirmation.
+
+### 🔒 20. Environment & Secret Sentinel (`vibe env`)
+Shield production secrets from accidental GitHub leaks and prevent CI deploy failures:
+* **Diff Audit & Auto-Sync**: Compares `.env` vs `.env.example`. Pass `--sync` to automatically append missing keys with sanitized dummy placeholders.
+* **Live Secret Detector**: Detects high-risk leaked keys (`sk_live_`, `ghp_`, `AKIA`) and verifies `.env` is protected by `.gitignore`.
+
+### 🎨 21. Native Obsidian Visual Canvas Generator (`vibe canvas`)
+Transform your startup codebase into an interactive 2D whiteboard:
+* **Native Obsidian .canvas Generator**: Generates `<Vault>/02-Projects/<name>/Project-Canvas.canvas` with structured visual cards (Project Hub, Active Sprint Tasks, Architecture Map, Database ER Diagram, Memory Bank Lessons).
+* **Connected Directional Edges**: Connects components with colored relational edges for birds-eye architectural clarity.
+
 ---
 
 ## 📦 Installation & Setup
@@ -212,6 +238,11 @@ Use `↑` / `↓` arrow keys to navigate and `Enter` to select:
 | `vibe map [path]` | Extracts codebase topology, module dependencies, and API routes | `vibe map` |
 | `vibe monetize [path]` | Scaffolds complete commercial Stripe subscriptions & billing | `vibe monetize` |
 | `vibe mock [dataFile]` | Launches zero-dependency local REST mock API server with CORS | `vibe mock` |
+| `vibe db [path]` | Parses database schema (Prisma/SQL), generates ER diagram & data dictionary | `vibe db` |
+| `vibe pack [pattern]` | Compresses source code into token-dense AST signatures & copies to clipboard | `vibe pack src/api -s` |
+| `vibe commit [msg]` | Analyzes git diff, generates conventional commit, and updates CHANGELOG | `vibe commit` |
+| `vibe env [--sync]` | Audits .env vs .env.example, detects secret leaks, and auto-syncs placeholders | `vibe env --sync` |
+| `vibe canvas [path]` | Generates native Obsidian 2D interactive visual canvas whiteboard | `vibe canvas` |
 | `vibe dev` | Launches the auto-detected development server | `vibe dev` |
 | `vibe check` | Runs the auto-detected build/test verification suite | `vibe check` |
 | `vibe snap "<note>"` | Logs a lesson, gotcha, or decision into Obsidian Memory Bank | `vibe snap "Fixed JWT refresh race condition"` |

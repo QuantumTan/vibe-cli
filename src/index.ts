@@ -25,6 +25,11 @@ import { checkpointCommand, rollbackCommand } from './commands/checkpoint.js';
 import { mapCommand } from './commands/map.js';
 import { monetizeCommand } from './commands/monetize.js';
 import { mockCommand } from './commands/mock.js';
+import { dbCommand } from './commands/db.js';
+import { packCommand } from './commands/pack.js';
+import { commitCommand } from './commands/commit.js';
+import { envCommand } from './commands/env.js';
+import { canvasCommand } from './commands/canvas.js';
 import {
   skillCompileCommand,
   skillCreateCommand,
@@ -137,6 +142,31 @@ export async function interactiveMainMenu(): Promise<void> {
         hint: 'Zero-dependency local HTTP API server with CORS',
       },
       {
+        value: 'db',
+        label: '🗄️ Database & Schema Visualizer (vibe db)',
+        hint: 'Generate ER diagram & table dictionary in Obsidian',
+      },
+      {
+        value: 'pack',
+        label: '🪶 Token-Optimized Context Packer (vibe pack)',
+        hint: 'Compress source code into token-dense AST signatures',
+      },
+      {
+        value: 'commit',
+        label: '📝 Semantic Conventional Commit (vibe commit)',
+        hint: 'Analyze diff and write conventional commits',
+      },
+      {
+        value: 'env',
+        label: '🔒 Environment & Secret Sentinel (vibe env)',
+        hint: 'Diff .env vs .env.example and shield leaks',
+      },
+      {
+        value: 'canvas',
+        label: '🎨 Native Obsidian Visual Canvas (vibe canvas)',
+        hint: 'Generate 2D interactive whiteboard canvas',
+      },
+      {
         value: 'skill',
         label: '⚡ Multi-Target AI Skill Compiler (vibe skill)',
         hint: 'Compile scripts into Antigravity, MCP, Cursor & OpenAI skills',
@@ -226,6 +256,21 @@ export async function interactiveMainMenu(): Promise<void> {
       break;
     case 'mock':
       await mockCommand();
+      break;
+    case 'db':
+      await dbCommand();
+      break;
+    case 'pack':
+      await packCommand();
+      break;
+    case 'commit':
+      await commitCommand();
+      break;
+    case 'env':
+      await envCommand();
+      break;
+    case 'canvas':
+      await canvasCommand();
       break;
     case 'skill': {
       const skillAction = await p.select({
@@ -628,6 +673,55 @@ program
       delay: parseInt(options.delay, 10),
       chaos: parseFloat(options.chaos),
     });
+  });
+
+// 25. vibe db
+program
+  .command('db')
+  .description('Parse database schema (Prisma/SQL), generate ER diagram, and write table dictionary')
+  .argument('[targetDir]', 'Target project directory (defaults to current dir)')
+  .action(async (targetDir) => {
+    await dbCommand(targetDir);
+  });
+
+// 26. vibe pack
+program
+  .command('pack')
+  .description('Compress source code into token-optimized AST signatures and copy dense context to clipboard')
+  .argument('[targetPattern]', 'File pattern or subdirectory to pack')
+  .option('-s, --signatures-only', 'Extract only exports, interfaces, and function signatures')
+  .option('-o, --out <file>', 'Custom output file path')
+  .action(async (targetPattern, options) => {
+    await packCommand(targetPattern, options);
+  });
+
+// 27. vibe commit
+program
+  .command('commit')
+  .description('Analyze git diff, generate conventional commit proposal, and update CHANGELOG.md')
+  .argument('[message...]', 'Optional commit message')
+  .action(async (messageParts) => {
+    const message = messageParts && messageParts.length > 0 ? messageParts.join(' ') : undefined;
+    await commitCommand(message);
+  });
+
+// 28. vibe env
+program
+  .command('env')
+  .description('Audit environment files (.env vs .env.example), detect secret leaks, and sync keys')
+  .option('-s, --sync', 'Automatically add missing keys to .env.example with placeholders')
+  .option('-c, --check', 'CI verification mode: exit with error if secrets leaked or unignored')
+  .action(async (options) => {
+    await envCommand(options);
+  });
+
+// 29. vibe canvas
+program
+  .command('canvas')
+  .description('Generate native Obsidian 2D visual canvas connecting project hub, tasks, and architecture')
+  .argument('[targetDir]', 'Target project directory (defaults to current dir)')
+  .action(async (targetDir) => {
+    await canvasCommand(targetDir);
   });
 
 program.parse();
