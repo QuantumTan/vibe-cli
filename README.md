@@ -96,7 +96,7 @@ One command to verify the status of Node.js, NPM, Git, .NET SDK, Flutter SDK, PH
 
 ### ⚡ 9. Multi-Target AI Skill & MCP Engine (`vibe skill`)
 Natively compile any Python, TypeScript, Bash script, or natural language intent into production AI agent skills with deterministic runtime safety shields:
-* **Multi-Target Generation**: Emits **Google Antigravity** (`SKILL.md` + standalone runner), **Anthropic Claude / MCP Server** (zero-dependency stdio JSON-RPC 2.0 server), **Cursor & Windsurf** (`.cursorrules` & `.windsurfrules`), and **OpenAI & Anthropic** JSON tool schemas.
+* **Multi-Target Generation**: Emits **Google Antigravity** (`SKILL.md` + standalone runner), **Anthropic Claude / MCP Server** (zero-dependency stdio JSON-RPC 2.0 server), **Cursor & Windsurf** (`.cursorrules` & `.windsurfrules`), **OpenAI & Anthropic** JSON tool schemas, **OpenCode Harness** (`opencode.json` with permission policies), **Nous Hermes Agent** (`hermes-tools.json`, `skill.yaml`, and `<tools>` function prompt templates), **Goose (Block)** (`goose-extension.yaml` & `.goosehints`), **Claude Code** (`.claude/mcp.json` & `CLAUDE.md`), **OpenHands** (`.openhands/microagents/`), **Aider** (`.aider.conf.yml`), and **Continue.dev** (`continue-config.json`).
 * **Deterministic Guardrails**: Auto-detects destructive verbs (`delete`, `drop`, `truncate`, `purge`, `format`, `kill`) and enforces explicit `confirm: true` or `dryRun: true` safety locks.
 * **Zero-Dependency Runtime Shields**: Injects path traversal protection (blocks `..`, `System32`, `/etc`), SSRF metadata shields (`169.254.169.254`), and sensitive secret redaction.
 * **Obsidian Vault Linkage**: Compiles skills directly into `.vault/Skills/<name>/` and automatically indexes them in `00-Symbol-Index.md` for live graph view visualization.
@@ -310,11 +310,11 @@ Prepare applications for production and monetization:
 Build and deploy deterministic AI tools:
 1. **Understand the Registry**: OmniRoute discovers tools located in `.vault/Skills/` and `./skills/`. In a fresh project, no tools exist until you create or compile one.
 2. **Synthesize tool from intent**: `vibe skill create "Flush Redis cache keys matching pattern"` creates a guarded skill with parameter schemas, safety locks, and an executable runner from natural language.
-3. **Compile existing scripts**: `vibe skill compile ./scripts/backup.py -t all` generates tools for Google Antigravity, MCP stdio server, Cursor, and JSON schemas with path traversal and SSRF shields.
+3. **Compile existing scripts**: `vibe skill compile ./scripts/backup.py -t all` generates tools for Google Antigravity, MCP stdio server, Cursor, OpenAI/Anthropic schemas, OpenCode, Nous Hermes Agent, Goose, Claude Code, OpenHands, Aider, and Continue.dev with path traversal and SSRF shields.
 4. **Ingest API**: `vibe skill from-api ./swagger.json` converts OpenAPI specifications into guarded AI agent tools.
 5. **List installed skills**: `vibe skill list` shows all active skills and their target platforms.
 6. **Safety sandbox**: `vibe skill test ./skills/db-cleaner` tests tools against security attack payloads.
-7. **Install to agents**: `vibe skill install ./skills/db-cleaner` wires tools into Claude Desktop, Antigravity, and Cursor.
+7. **Install to agents**: `vibe skill install ./skills/db-cleaner` wires tools into Claude Desktop, Antigravity, Cursor, OpenCode, Nous Hermes Agent, Goose, Claude Code, and OpenHands.
 8. **Tool Switchboard**: `vibe route "purge expired sessions"` routes natural language intents directly to matching tools, or `vibe route --server` runs as a unified stdio MCP server.
 
 ---

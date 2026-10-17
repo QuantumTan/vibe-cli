@@ -45,7 +45,19 @@ export interface SkillTool {
   guardrails: SkillGuardrailConfig;
 }
 
-export type SkillTarget = 'all' | 'antigravity' | 'mcp' | 'cursor' | 'openai';
+export type SkillTarget =
+  | 'all'
+  | 'antigravity'
+  | 'mcp'
+  | 'cursor'
+  | 'openai'
+  | 'opencode'
+  | 'hermes'
+  | 'goose'
+  | 'claudecode'
+  | 'openhands'
+  | 'aider'
+  | 'continue';
 
 export interface SkillIR {
   name: string;

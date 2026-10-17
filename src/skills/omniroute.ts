@@ -1,4 +1,5 @@
 import path from 'path';
+import os from 'os';
 import fs from 'fs-extra';
 import readline from 'node:readline';
 import { spawn } from 'child_process';
@@ -30,6 +31,9 @@ export async function discoverAllTools(baseDir = process.cwd()): Promise<Discove
   const searchDirs = [
     path.join(baseDir, '.vault', 'Skills'),
     path.join(baseDir, 'skills'),
+    path.join(baseDir, '.opencode', 'skills'),
+    path.join(baseDir, '.claude', 'skills'),
+    path.join(os.homedir(), '.hermes', 'skills'),
   ];
 
   const tools: DiscoveredTool[] = [];

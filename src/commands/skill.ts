@@ -6,7 +6,7 @@ import { compileSkill } from '../skills/compiler.js';
 import { openWindowsFilePicker } from '../gui-picker.js';
 import { SkillTarget, SkillTool } from '../skills/types.js';
 import { testSkill } from '../skills/tester.js';
-import { installSkillToClients } from '../skills/installer.js';
+import { installSkillToClients, SupportedClient } from '../skills/installer.js';
 import { parseOpenAPISpec } from '../skills/openapi.js';
 import { auditSkill } from '../skills/auditor.js';
 
@@ -22,6 +22,7 @@ export interface SkillCreateOptions {
   target?: SkillTarget;
   out?: string;
 }
+
 
 /**
  * Register compiled skill in Obsidian Vault Symbol Index for graph linkage.
@@ -108,11 +109,18 @@ export async function skillCompileCommand(
     const selectedTarget = await p.select({
       message: 'Select compilation target for this AI skill:',
       options: [
-        { value: 'all', label: '🌐 All Targets (Antigravity SKILL.md, MCP Server, Cursor, OpenAI)' },
+        { value: 'all', label: '🌐 All Targets (Antigravity, MCP, Cursor, OpenAI, OpenCode, Hermes, Goose, Claude Code, OpenHands, Aider, Continue)' },
         { value: 'antigravity', label: '💎 Google Antigravity (SKILL.md + Guarded Standalone Runner)' },
         { value: 'mcp', label: '🔌 Anthropic Claude / MCP Server (Zero-Dependency Stdio Server)' },
         { value: 'cursor', label: '⚡ Cursor / Windsurf (.cursorrules & .windsurfrules)' },
         { value: 'openai', label: '🤖 OpenAI & Anthropic JSON Tools (Function Calling Schema)' },
+        { value: 'opencode', label: '⚡ OpenCode Harness (opencode.json MCP & Permission Policy)' },
+        { value: 'hermes', label: '🏺 Nous Hermes Agent (~/.hermes/skills & <tools> Function Calling)' },
+        { value: 'goose', label: '🪿 Goose (Block) (goose-extension.yaml & .goosehints)' },
+        { value: 'claudecode', label: '📟 Claude Code (.claude/mcp.json & CLAUDE.md)' },
+        { value: 'openhands', label: '🙌 OpenHands (.openhands/microagents/)' },
+        { value: 'aider', label: '🤝 Aider (.aider.conf.yml & .aiderignore)' },
+        { value: 'continue', label: '⏩ Continue.dev (continue-config.json MCP Server)' },
       ],
     });
 
@@ -264,7 +272,18 @@ export async function skillListCommand(): Promise<void> {
     path.join(cwd, 'skills'),
   ];
 
-  const skillsFound: Array<{ name: string; dir: string; hasMcp: boolean; hasAntigravity: boolean; hasCursor: boolean }> = [];
+  const skillsFound: Array<{
+    name: string;
+    dir: string;
+    hasMcp: boolean;
+    hasAntigravity: boolean;
+    hasCursor: boolean;
+    hasOpenCode: boolean;
+    hasHermes: boolean;
+    hasGoose: boolean;
+    hasClaudeCode: boolean;
+    hasOpenHands: boolean;
+  }> = [];
 
   for (const dir of searchDirs) {
     if (await fs.pathExists(dir)) {
@@ -275,6 +294,11 @@ export async function skillListCommand(): Promise<void> {
           const hasMcp = await fs.pathExists(path.join(skillDir, 'mcp-server.js'));
           const hasAntigravity = await fs.pathExists(path.join(skillDir, 'SKILL.md'));
           const hasCursor = await fs.pathExists(path.join(skillDir, '.cursorrules'));
+          const hasOpenCode = await fs.pathExists(path.join(skillDir, 'opencode.json'));
+          const hasHermes = await fs.pathExists(path.join(skillDir, 'hermes-tools.json'));
+          const hasGoose = await fs.pathExists(path.join(skillDir, 'goose-extension.yaml'));
+          const hasClaudeCode = await fs.pathExists(path.join(skillDir, 'CLAUDE.md'));
+          const hasOpenHands = await fs.pathExists(path.join(skillDir, '.openhands'));
 
           skillsFound.push({
             name: entry.name,
@@ -282,6 +306,11 @@ export async function skillListCommand(): Promise<void> {
             hasMcp,
             hasAntigravity,
             hasCursor,
+            hasOpenCode,
+            hasHermes,
+            hasGoose,
+            hasClaudeCode,
+            hasOpenHands,
           });
         }
       }
@@ -300,6 +329,11 @@ export async function skillListCommand(): Promise<void> {
       s.hasAntigravity ? pc.green('Antigravity') : '',
       s.hasMcp ? pc.cyan('MCP') : '',
       s.hasCursor ? pc.magenta('Cursor') : '',
+      s.hasOpenCode ? pc.blue('OpenCode') : '',
+      s.hasHermes ? pc.yellow('Hermes') : '',
+      s.hasGoose ? pc.cyan('Goose') : '',
+      s.hasClaudeCode ? pc.magenta('ClaudeCode') : '',
+      s.hasOpenHands ? pc.green('OpenHands') : '',
     ].filter(Boolean).join(' • ');
 
     return `  ⚡ ${pc.bold(pc.white(s.name))} [${targets || 'Standard'}]\n     ${pc.dim(s.dir)}`;
@@ -434,7 +468,16 @@ export async function skillInstallCommand(
     }
   }
 
-  let selectedClients: Array<'claude' | 'antigravity' | 'cursor'> = ['claude', 'antigravity', 'cursor'];
+  let selectedClients: SupportedClient[] = [
+    'claude',
+    'antigravity',
+    'cursor',
+    'opencode',
+    'hermes',
+    'goose',
+    'claudecode',
+    'openhands',
+  ];
 
   if (!options.all) {
     const picked = await p.multiselect({
@@ -443,12 +486,17 @@ export async function skillInstallCommand(
         { value: 'claude', label: '🔌 Claude Desktop (registers MCP stdio server in claude_desktop_config.json)' },
         { value: 'antigravity', label: '💎 Google Antigravity (copies to ~/.gemini/antigravity/skills/)' },
         { value: 'cursor', label: '⚡ Cursor / Windsurf (injects rules into project .cursorrules)' },
+        { value: 'opencode', label: '⚡ OpenCode (registers MCP server in workspace opencode.json)' },
+        { value: 'hermes', label: '🏺 Nous Hermes Agent (installs into ~/.hermes/skills/)' },
+        { value: 'goose', label: '🪿 Goose (registers MCP extension in Goose config.yaml)' },
+        { value: 'claudecode', label: '📟 Claude Code (registers MCP server in project .claude/mcp.json)' },
+        { value: 'openhands', label: '🙌 OpenHands (installs microagent in workspace .openhands/microagents/)' },
       ],
-      initialValues: ['claude', 'antigravity', 'cursor'],
+      initialValues: ['claude', 'antigravity', 'cursor', 'opencode', 'hermes', 'goose', 'claudecode', 'openhands'],
     });
 
     if (p.isCancel(picked)) return;
-    selectedClients = picked as Array<'claude' | 'antigravity' | 'cursor'>;
+    selectedClients = picked as SupportedClient[];
   }
 
   const s = p.spinner();

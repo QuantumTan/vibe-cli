@@ -2,8 +2,18 @@ import path from 'path';
 import fs from 'fs-extra';
 import os from 'os';
 
+export type SupportedClient =
+  | 'claude'
+  | 'antigravity'
+  | 'cursor'
+  | 'opencode'
+  | 'hermes'
+  | 'goose'
+  | 'claudecode'
+  | 'openhands';
+
 export interface InstallResult {
-  client: 'claude' | 'antigravity' | 'cursor';
+  client: SupportedClient;
   status: 'installed' | 'updated' | 'skipped' | 'failed';
   path: string;
   message: string;
@@ -19,12 +29,20 @@ export function getClaudeDesktopConfigPath(): string {
   }
 }
 
+export function getGooseConfigPath(): string {
+  if (os.platform() === 'win32') {
+    return path.join(process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming'), 'Block', 'goose', 'config', 'config.yaml');
+  } else {
+    return path.join(os.homedir(), '.config', 'goose', 'config.yaml');
+  }
+}
+
 /**
- * Installs a compiled skill to Claude Desktop MCP, Antigravity, and Cursor.
+ * Installs a compiled skill to Claude Desktop MCP, Antigravity, Cursor, OpenCode, and Hermes.
  */
 export async function installSkillToClients(
   skillDir: string,
-  clients: Array<'claude' | 'antigravity' | 'cursor'> = ['claude', 'antigravity', 'cursor']
+  clients: SupportedClient[] = ['claude', 'antigravity', 'cursor', 'opencode', 'hermes']
 ): Promise<InstallResult[]> {
   const resolvedDir = path.resolve(skillDir);
   const skillName = path.basename(resolvedDir);
@@ -173,6 +191,271 @@ export async function installSkillToClients(
           message: err.message,
         });
       }
+    }
+  }
+
+  // 4. OpenCode Installation
+  if (clients.includes('opencode')) {
+    if (!fs.existsSync(mcpServerFile)) {
+      results.push({
+        client: 'opencode',
+        status: 'skipped',
+        path: '',
+        message: 'No mcp-server.js found in skill directory.',
+      });
+    } else {
+      try {
+        const cwd = process.cwd();
+        const configPath = path.join(cwd, 'opencode.json');
+        let config: any = {
+          $schema: 'https://opencode.ai/config.json',
+          mcp: {},
+        };
+
+        if (await fs.pathExists(configPath)) {
+          try {
+            config = await fs.readJson(configPath);
+            if (!config.mcp) config.mcp = {};
+          } catch {
+            config = { $schema: 'https://opencode.ai/config.json', mcp: {} };
+          }
+        }
+
+        const isUpdate = !!config.mcp[skillName];
+        config.mcp[skillName] = {
+          type: 'local',
+          command: ['node', mcpServerFile],
+          enabled: true,
+        };
+
+        await fs.writeJson(configPath, config, { spaces: 2 });
+        results.push({
+          client: 'opencode',
+          status: isUpdate ? 'updated' : 'installed',
+          path: configPath,
+          message: `Configured '${skillName}' MCP server in workspace opencode.json.`,
+        });
+      } catch (err: any) {
+        results.push({
+          client: 'opencode',
+          status: 'failed',
+          path: '',
+          message: err.message,
+        });
+      }
+    }
+  }
+
+  // 5. Nous Hermes Agent Installation
+  if (clients.includes('hermes')) {
+    const hermesToolsFile = path.join(resolvedDir, 'hermes-tools.json');
+    if (!fs.existsSync(skillMdFile) && !fs.existsSync(hermesToolsFile)) {
+      results.push({
+        client: 'hermes',
+        status: 'skipped',
+        path: '',
+        message: 'No SKILL.md or hermes-tools.json found in skill directory.',
+      });
+    } else {
+      try {
+        const hermesSkillsDir = path.join(os.homedir(), '.hermes', 'skills', skillName);
+        await fs.ensureDir(hermesSkillsDir);
+
+        if (await fs.pathExists(skillMdFile)) {
+          await fs.copy(skillMdFile, path.join(hermesSkillsDir, 'SKILL.md'));
+        }
+        if (await fs.pathExists(hermesToolsFile)) {
+          await fs.copy(hermesToolsFile, path.join(hermesSkillsDir, 'hermes-tools.json'));
+        }
+        const skillYaml = path.join(resolvedDir, 'skill.yaml');
+        if (await fs.pathExists(skillYaml)) {
+          await fs.copy(skillYaml, path.join(hermesSkillsDir, 'skill.yaml'));
+        }
+        const hermesPrompt = path.join(resolvedDir, 'hermes-prompt.md');
+        if (await fs.pathExists(hermesPrompt)) {
+          await fs.copy(hermesPrompt, path.join(hermesSkillsDir, 'hermes-prompt.md'));
+        }
+        const scriptsDir = path.join(resolvedDir, 'scripts');
+        if (await fs.pathExists(scriptsDir)) {
+          await fs.copy(scriptsDir, path.join(hermesSkillsDir, 'scripts'));
+        }
+
+        results.push({
+          client: 'hermes',
+          status: 'installed',
+          path: hermesSkillsDir,
+          message: `Installed Hermes Agent skill package into ~/.hermes/skills/${skillName}`,
+        });
+      } catch (err: any) {
+        results.push({
+          client: 'hermes',
+          status: 'failed',
+          path: '',
+          message: err.message,
+        });
+      }
+    }
+  }
+
+  // 6. Goose (Block) Installation
+  if (clients.includes('goose')) {
+    if (!fs.existsSync(mcpServerFile)) {
+      results.push({
+        client: 'goose',
+        status: 'skipped',
+        path: '',
+        message: 'No mcp-server.js found in skill directory.',
+      });
+    } else {
+      try {
+        const gooseConfigPath = getGooseConfigPath();
+        await fs.ensureDir(path.dirname(gooseConfigPath));
+
+        const extensionSnippet = `
+  ${skillName}:
+    enabled: true
+    type: stdio
+    cmd: node
+    args:
+      - "${mcpServerFile.replace(/\\/g, '/')}"
+    envs:
+      VIBE_GUARDRAILS_ENABLED: "true"
+`;
+
+        if (await fs.pathExists(gooseConfigPath)) {
+          const existing = await fs.readFile(gooseConfigPath, 'utf8');
+          if (existing.includes(`${skillName}:`)) {
+            results.push({
+              client: 'goose',
+              status: 'skipped',
+              path: gooseConfigPath,
+              message: `Extension '${skillName}' already active in Goose config.yaml.`,
+            });
+          } else if (existing.includes('extensions:')) {
+            const updated = existing.replace('extensions:', `extensions:${extensionSnippet}`);
+            await fs.writeFile(gooseConfigPath, updated, 'utf8');
+            results.push({
+              client: 'goose',
+              status: 'updated',
+              path: gooseConfigPath,
+              message: `Appended '${skillName}' MCP extension to Goose config.yaml.`,
+            });
+          } else {
+            const updated = `${existing.trim()}\n\nextensions:${extensionSnippet}`;
+            await fs.writeFile(gooseConfigPath, updated, 'utf8');
+            results.push({
+              client: 'goose',
+              status: 'updated',
+              path: gooseConfigPath,
+              message: `Configured extensions block with '${skillName}' in Goose config.yaml.`,
+            });
+          }
+        } else {
+          const newConfig = `# Goose Agent Configuration\nextensions:${extensionSnippet}\n`;
+          await fs.writeFile(gooseConfigPath, newConfig, 'utf8');
+          results.push({
+            client: 'goose',
+            status: 'installed',
+            path: gooseConfigPath,
+            message: `Created Goose config.yaml with '${skillName}' MCP extension.`,
+          });
+        }
+      } catch (err: any) {
+        results.push({
+          client: 'goose',
+          status: 'failed',
+          path: '',
+          message: err.message,
+        });
+      }
+    }
+  }
+
+  // 7. Claude Code (Anthropic CLI) Installation
+  if (clients.includes('claudecode')) {
+    if (!fs.existsSync(mcpServerFile)) {
+      results.push({
+        client: 'claudecode',
+        status: 'skipped',
+        path: '',
+        message: 'No mcp-server.js found in skill directory.',
+      });
+    } else {
+      try {
+        const cwd = process.cwd();
+        const claudeMcpFile = path.join(cwd, '.claude', 'mcp.json');
+        await fs.ensureDir(path.dirname(claudeMcpFile));
+
+        let config: any = { mcpServers: {} };
+        if (await fs.pathExists(claudeMcpFile)) {
+          try {
+            config = await fs.readJson(claudeMcpFile);
+            if (!config.mcpServers) config.mcpServers = {};
+          } catch {
+            config = { mcpServers: {} };
+          }
+        }
+
+        const isUpdate = !!config.mcpServers[skillName];
+        config.mcpServers[skillName] = {
+          command: 'node',
+          args: [mcpServerFile],
+        };
+
+        await fs.writeJson(claudeMcpFile, config, { spaces: 2 });
+        results.push({
+          client: 'claudecode',
+          status: isUpdate ? 'updated' : 'installed',
+          path: claudeMcpFile,
+          message: `Configured '${skillName}' MCP server in project .claude/mcp.json.`,
+        });
+      } catch (err: any) {
+        results.push({
+          client: 'claudecode',
+          status: 'failed',
+          path: '',
+          message: err.message,
+        });
+      }
+    }
+  }
+
+  // 8. OpenHands Microagent Installation
+  if (clients.includes('openhands')) {
+    const microagentSource = path.join(resolvedDir, '.openhands', 'microagents', `${skillName}.md`);
+    try {
+      const cwd = process.cwd();
+      const targetMicroagent = path.join(cwd, '.openhands', 'microagents', `${skillName}.md`);
+      await fs.ensureDir(path.dirname(targetMicroagent));
+
+      if (await fs.pathExists(microagentSource)) {
+        await fs.copy(microagentSource, targetMicroagent);
+      } else {
+        const fallbackContent = `---
+name: ${skillName}
+agent: CodeActAgent
+triggers:
+  - "${skillName}"
+---
+# ${skillName} Microagent
+Use \`scripts/run.js\` to safely execute this skill suite.
+`;
+        await fs.writeFile(targetMicroagent, fallbackContent, 'utf8');
+      }
+
+      results.push({
+        client: 'openhands',
+        status: 'installed',
+        path: targetMicroagent,
+        message: `Installed '${skillName}' microagent in workspace .openhands/microagents/.`,
+      });
+    } catch (err: any) {
+      results.push({
+        client: 'openhands',
+        status: 'failed',
+        path: '',
+        message: err.message,
+      });
     }
   }
 

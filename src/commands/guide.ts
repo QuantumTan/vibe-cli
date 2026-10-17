@@ -185,7 +185,9 @@ or create at least one skill before routing intents.
 
 2. Compile an existing Python or TypeScript script:
    vibe skill compile ./scripts/backup.py -t all
-   Extracts functions, types, and docstrings into multi-target skill definitions.
+   Extracts functions, types, and docstrings into multi-target skill definitions:
+   Antigravity, MCP Server, Cursor, OpenAI, OpenCode, Nous Hermes, Goose,
+   Claude Code, OpenHands, Aider, and Continue.dev.
 
 3. Ingest OpenAPI into guarded tools:
    vibe skill from-api ./swagger.json
@@ -200,7 +202,9 @@ or create at least one skill before routing intents.
 
 6. Install skill to agent clients:
    vibe skill install ./skills/db-cleaner
-   One-command installation into Claude Desktop, Antigravity, and Cursor configs.
+   One-command installation into Claude Desktop, Antigravity, Cursor,
+   OpenCode (opencode.json), Nous Hermes (~/.hermes/skills/),
+   Goose (config.yaml), Claude Code (.claude/mcp.json), and OpenHands.
 
 7. Route natural language to tools:
    vibe route "purge expired user sessions"

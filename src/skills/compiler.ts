@@ -11,6 +11,13 @@ import { generateAntigravityTarget } from './generators/antigravity.js';
 import { generateMcpTarget } from './generators/mcp.js';
 import { generateCursorTarget } from './generators/cursor.js';
 import { generateOpenAITarget } from './generators/openai.js';
+import { generateOpenCodeTarget } from './generators/opencode.js';
+import { generateHermesTarget } from './generators/hermes.js';
+import { generateGooseTarget } from './generators/goose.js';
+import { generateClaudeCodeTarget } from './generators/claudecode.js';
+import { generateOpenHandsTarget } from './generators/openhands.js';
+import { generateAiderTarget } from './generators/aider.js';
+import { generateContinueTarget } from './generators/continue.js';
 
 export interface CompileOptions {
   target?: SkillTarget;
@@ -61,6 +68,34 @@ export async function compileSkill(
 
   if (target === 'all' || target === 'openai') {
     files.push(...generateOpenAITarget(skill));
+  }
+
+  if (target === 'all' || target === 'opencode') {
+    files.push(...generateOpenCodeTarget(skill));
+  }
+
+  if (target === 'all' || target === 'hermes') {
+    files.push(...generateHermesTarget(skill));
+  }
+
+  if (target === 'all' || target === 'goose') {
+    files.push(...generateGooseTarget(skill));
+  }
+
+  if (target === 'all' || target === 'claudecode') {
+    files.push(...generateClaudeCodeTarget(skill));
+  }
+
+  if (target === 'all' || target === 'openhands') {
+    files.push(...generateOpenHandsTarget(skill));
+  }
+
+  if (target === 'all' || target === 'aider') {
+    files.push(...generateAiderTarget(skill));
+  }
+
+  if (target === 'all' || target === 'continue') {
+    files.push(...generateContinueTarget(skill));
   }
 
   // 3. Write files if outDir requested

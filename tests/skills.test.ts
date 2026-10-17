@@ -123,6 +123,18 @@ describe('Skill Multi-Target Compiler', () => {
     expect(fileNames).toContain('.windsurfrules');
     expect(fileNames).toContain('openai-tools.json');
     expect(fileNames).toContain('anthropic-tools.json');
+    expect(fileNames).toContain('opencode.json');
+    expect(fileNames).toContain('opencode-tools.json');
+    expect(fileNames).toContain('hermes-tools.json');
+    expect(fileNames).toContain('hermes-prompt.md');
+    expect(fileNames).toContain('skill.yaml');
+    expect(fileNames).toContain('goose-extension.yaml');
+    expect(fileNames).toContain('.goosehints');
+    expect(fileNames).toContain('.claude/mcp.json');
+    expect(fileNames).toContain('CLAUDE.md');
+    expect(fileNames).toContain('.aider.conf.yml');
+    expect(fileNames).toContain('.aiderignore');
+    expect(fileNames).toContain('continue-config.json');
 
     // Verify MCP Server content has valid JSON-RPC structure
     const mcpServer = result.files.find((f) => f.relativePath === 'mcp-server.js');
@@ -135,6 +147,75 @@ describe('Skill Multi-Target Compiler', () => {
     const skillMd = result.files.find((f) => f.relativePath === 'SKILL.md');
     expect(skillMd?.content).toContain('---');
     expect(skillMd?.content).toContain('## Security & Guardrail Policy');
+
+    // Verify OpenCode configuration
+    const opencodeCfg = result.files.find((f) => f.relativePath === 'opencode.json');
+    expect(opencodeCfg?.content).toContain('https://opencode.ai/config.json');
+    expect(opencodeCfg?.content).toContain('mcp');
+
+    // Verify Hermes prompt with <tools> XML tags
+    const hermesPrompt = result.files.find((f) => f.relativePath === 'hermes-prompt.md');
+    expect(hermesPrompt?.content).toContain('<tools>');
+    expect(hermesPrompt?.content).toContain('<tool_call>');
+
+    // Verify Goose extension
+    const gooseExt = result.files.find((f) => f.relativePath === 'goose-extension.yaml');
+    expect(gooseExt?.content).toContain('extensions:');
+    expect(gooseExt?.content).toContain('stdio');
+
+    // Verify Claude Code configuration
+    const claudeMcp = result.files.find((f) => f.relativePath === '.claude/mcp.json');
+    expect(claudeMcp?.content).toContain('mcpServers');
+  });
+
+  it('compiles specifically to OpenCode target', async () => {
+    const intent = 'Ping remote health endpoint url';
+    const result = await compileSkill(intent, { target: 'opencode', writeFiles: false });
+    const fileNames = result.files.map((f) => f.relativePath);
+    expect(fileNames).toContain('opencode.json');
+    expect(fileNames).toContain('opencode-tools.json');
+  });
+
+  it('compiles specifically to Nous Hermes target', async () => {
+    const intent = 'Flush Redis cache keys pattern';
+    const result = await compileSkill(intent, { target: 'hermes', writeFiles: false });
+    const fileNames = result.files.map((f) => f.relativePath);
+    expect(fileNames).toContain('hermes-tools.json');
+    expect(fileNames).toContain('hermes-prompt.md');
+    expect(fileNames).toContain('skill.yaml');
+  });
+
+  it('compiles specifically to Goose target', async () => {
+    const intent = 'Analyze PostgreSQL connection pool status';
+    const result = await compileSkill(intent, { target: 'goose', writeFiles: false });
+    const fileNames = result.files.map((f) => f.relativePath);
+    expect(fileNames).toContain('goose-extension.yaml');
+    expect(fileNames).toContain('.goosehints');
+  });
+
+  it('compiles specifically to Claude Code target', async () => {
+    const intent = 'Trigger Docker container rebuild';
+    const result = await compileSkill(intent, { target: 'claudecode', writeFiles: false });
+    const fileNames = result.files.map((f) => f.relativePath);
+    expect(fileNames).toContain('.claude/mcp.json');
+    expect(fileNames).toContain('CLAUDE.md');
+  });
+
+  it('compiles specifically to OpenHands target', async () => {
+    const intent = 'Run Prisma database migrations';
+    const result = await compileSkill(intent, { target: 'openhands', writeFiles: false });
+    const file = result.files.find((f) => f.relativePath.startsWith('.openhands/microagents/'));
+    expect(file).toBeDefined();
+    expect(file?.content).toContain('CodeActAgent');
+  });
+
+  it('compiles specifically to Aider and Continue targets', async () => {
+    const intent = 'Format TypeScript codebase';
+    const aiderRes = await compileSkill(intent, { target: 'aider', writeFiles: false });
+    expect(aiderRes.files.map((f) => f.relativePath)).toContain('.aider.conf.yml');
+
+    const continueRes = await compileSkill(intent, { target: 'continue', writeFiles: false });
+    expect(continueRes.files.map((f) => f.relativePath)).toContain('continue-config.json');
   });
 });
 
