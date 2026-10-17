@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use vibe-cli in research, publications, or benchmarks, please cite it as below."
+title: "vibe-cli: Universal Vibe Coding Assistant & AI Memory Bank Orchestrator"
+version: 1.0.0
+date-released: 2026-10-17
+url: "https://github.com/QuantumTan/vibe-cli"
+repository-code: "https://github.com/QuantumTan/vibe-cli"
+license: MIT
+keywords:
+  - "vibe-coding"
+  - "ai-coding"
+  - "obsidian"
+  - "model-context-protocol"
+  - "mcp"
+  - "memory-bank"
+  - "antigravity"
+  - "cursor"
+  - "claude-code"
+  - "developer-tools"
