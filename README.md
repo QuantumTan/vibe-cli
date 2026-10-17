@@ -101,6 +101,24 @@ Natively compile any Python, TypeScript, Bash script, or natural language intent
 * **Zero-Dependency Runtime Shields**: Injects path traversal protection (blocks `..`, `System32`, `/etc`), SSRF metadata shields (`169.254.169.254`), and sensitive secret redaction.
 * **Obsidian Vault Linkage**: Compiles skills directly into `.vault/Skills/<name>/` and automatically indexes them in `00-Symbol-Index.md` for live graph view visualization.
 
+### 🧭 10. OmniRoute AI Tool Switchboard (`vibe route`)
+Universal gateway and semantic intent dispatcher for all installed skills across your Obsidian vaults:
+* **Natural Language Routing**: Type `vibe route "purge redis cache and drop stale keys"` to automatically discover, score, and execute matching tools across your skills with confidence ranking and parameter extraction.
+* **MCP Server Multiplexer**: Run `vibe route --server` to expose all installed skills dynamically as a unified stdio MCP server for Antigravity, Cursor, and Claude Desktop.
+
+### 🧠 11. Principal Architect Feature Interview (`vibe clarify`)
+Eliminates vague prompts and costly mid-sprint architectural refactors:
+* **Architectural Questionnaire**: Grills the developer across 5 foundational pillars: Data & Persistence, Auth & Security Boundary, Failure & Resilience Strategy, Latency & Optimistic UI Profile, and Commercial Controls.
+* **Locked Production PRD**: Synthesizes a structured PRD into `.vault/Specs/<feature>-PRD.md` with complete TypeScript schemas, typed error boundaries, and copies strict anti-slop prompt directives to the clipboard.
+
+### 🚢 12. Commercial Launch Gate & Launchpad (`vibe ship`)
+The ultimate pre-flight checklist for deploying profitable, production-grade applications:
+* **Secrets & Env Sanitization**: Blocks placeholder and staging keys (`sk_test_`, `localhost:8080`, `CHANGEME`).
+* **SEO & Web Asset Scaffolding**: Ensures `public/robots.txt` is present and properly configured.
+* **Legal Compliance Suite**: Auto-scaffolds GDPR/CCPA-compliant `Privacy-Policy.md` and `Terms-of-Service.md` into `.vault/Legal/`.
+* **Zero-Error Verification Gate**: Runs the project's native build and test suite (`npm run build`, `dotnet build`, etc.).
+* **Deployment Automation**: Scaffolds production multi-stage `Dockerfile` and GitHub Actions CI/CD workflows if missing.
+
 ---
 
 ## 📦 Installation & Setup
@@ -164,7 +182,10 @@ Use `↑` / `↓` arrow keys to navigate and `Enter` to select:
 | `vibe new-vault [name]` | Shortcut: Scaffolds and registers a new Obsidian vault | `vibe new-vault Client-Vault` |
 | `vibe audit [path]` | Runs commercial readiness & quality audit (security, payments, UX) | `vibe audit` |
 | `vibe prompt [task]` | Synthesizes codebase context and copies anti-slop master prompt to clipboard | `vibe prompt "Add Stripe billing"` |
+| `vibe clarify [feature]` | Principal Architect interview: eliminates prompt drift & locks down architectural PRD | `vibe clarify "Stripe Checkout"` |
 | `vibe spec [feature]` | Generates a complete PRD & feature specification in Obsidian | `vibe spec "Subscription Billing"` |
+| `vibe ship [path]` | Commercial launch gate & launchpad (secrets, GDPR legal suite, SEO, CI/CD) | `vibe ship` |
+| `vibe route [intent]` | OmniRoute AI Tool Gateway: semantic dispatcher & MCP server multiplexer | `vibe route "purge redis cache"` |
 | `vibe dev` | Launches the auto-detected development server | `vibe dev` |
 | `vibe check` | Runs the auto-detected build/test verification suite | `vibe check` |
 | `vibe snap "<note>"` | Logs a lesson, gotcha, or decision into Obsidian Memory Bank | `vibe snap "Fixed JWT refresh race condition"` |

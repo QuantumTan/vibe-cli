@@ -18,6 +18,9 @@ import { doctorCommand } from './commands/doctor.js';
 import { auditCommand } from './commands/audit.js';
 import { promptCommand } from './commands/prompt.js';
 import { specCommand } from './commands/spec.js';
+import { routeCommand } from './commands/route.js';
+import { clarifyCommand } from './commands/clarify.js';
+import { shipCommand } from './commands/ship.js';
 import {
   skillCompileCommand,
   skillCreateCommand,
@@ -80,14 +83,29 @@ export async function interactiveMainMenu(): Promise<void> {
         hint: 'Synthesize context & copy anti-slop prompt to clipboard',
       },
       {
+        value: 'clarify',
+        label: '🧠 Architect Feature Interview (vibe clarify)',
+        hint: 'Grill requirements & generate locked architectural PRD',
+      },
+      {
         value: 'spec',
         label: '📐 Architect Feature PRD & Spec (vibe spec)',
         hint: 'Generate production feature blueprint in Obsidian',
       },
       {
+        value: 'ship',
+        label: '🚢 Launchpad & Commercial Ship Gate (vibe ship)',
+        hint: 'Verify secrets, SEO, legal GDPR policies & deployment',
+      },
+      {
         value: 'audit',
         label: '🛡️  Run Production & Commercial Audit (vibe audit)',
         hint: 'Score readiness across security, payments, and UX',
+      },
+      {
+        value: 'route',
+        label: '🧭 OmniRoute AI Tool Switchboard (vibe route)',
+        hint: 'Universal gateway & semantic intent dispatcher for skills',
       },
       {
         value: 'skill',
@@ -150,11 +168,20 @@ export async function interactiveMainMenu(): Promise<void> {
     case 'prompt':
       await promptCommand();
       break;
+    case 'clarify':
+      await clarifyCommand();
+      break;
     case 'spec':
       await specCommand();
       break;
+    case 'ship':
+      await shipCommand();
+      break;
     case 'audit':
       await auditCommand();
+      break;
+    case 'route':
+      await routeCommand();
       break;
     case 'skill': {
       const skillAction = await p.select({
@@ -472,6 +499,37 @@ skillCmd
   .argument('[skillDir]', 'Path to the compiled skill folder or manifest')
   .action(async (skillDir) => {
     await skillAuditCommand(skillDir);
+  });
+
+// 17. vibe clarify
+program
+  .command('clarify')
+  .description('Interactive Principal Architect interview to eliminate vague requirements & output locked PRD')
+  .argument('[featureName...]', 'Feature or module to clarify')
+  .action(async (featureParts) => {
+    const feature = featureParts && featureParts.length > 0 ? featureParts.join(' ') : undefined;
+    await clarifyCommand(feature);
+  });
+
+// 18. vibe ship
+program
+  .command('ship')
+  .description('Commercial launch gate & launchpad (secrets, GDPR legal suite, SEO, CI/CD, verification)')
+  .argument('[targetDir]', 'Project directory to audit for launch (defaults to current dir)')
+  .action(async (targetDir) => {
+    await shipCommand(targetDir);
+  });
+
+// 19. vibe route
+program
+  .command('route')
+  .description('OmniRoute Universal AI Tool Gateway & semantic intent dispatcher')
+  .argument('[intent...]', 'Task or intent to route to installed AI skills')
+  .option('-s, --server', 'Run OmniRoute as a stdio MCP Server multiplexer')
+  .option('-d, --dry-run', 'Preview matched tools without executing')
+  .action(async (intentParts, options) => {
+    const intent = intentParts && intentParts.length > 0 ? intentParts.join(' ') : undefined;
+    await routeCommand(intent, options);
   });
 
 program.parse();
