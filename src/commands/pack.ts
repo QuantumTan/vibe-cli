@@ -117,7 +117,7 @@ export async function packSourceFiles(
       totalPackedChars += minified.length;
 
       packedFiles.push({
-        relPath,
+        relPath: relFile,
         originalSize: original.length,
         packedSize: minified.length,
         content: minified,

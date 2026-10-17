@@ -24,6 +24,7 @@ import { shipCommand } from './commands/ship.js';
 import { checkpointCommand, rollbackCommand } from './commands/checkpoint.js';
 import { rewindCommand } from './commands/rewind.js';
 import { explainCommand } from './commands/explain.js';
+import { healthCommand } from './commands/health.js';
 import { mapCommand } from './commands/map.js';
 import { monetizeCommand } from './commands/monetize.js';
 import { mockCommand } from './commands/mock.js';
@@ -102,6 +103,7 @@ export async function interactiveMainMenu(): Promise<void> {
           { value: 'prompt', label: 'Generate context prompt', hint: 'vibe prompt' },
           { value: 'pack', label: 'Pack context signatures', hint: 'vibe pack' },
           { value: 'canvas', label: 'Generate visual canvas', hint: 'vibe canvas' },
+          { value: 'health', label: 'AI readiness score & health', hint: 'vibe health' },
           { value: 'explain', label: 'Explain AI changes & risks', hint: 'vibe explain' },
           { value: 'rewind', label: '1-click AI panic undo (rewind)', hint: 'vibe rewind' },
           { value: 'checkpoint', label: 'Create snapshot checkpoint', hint: 'vibe checkpoint' },
@@ -115,6 +117,7 @@ export async function interactiveMainMenu(): Promise<void> {
       if (sub === 'prompt') { await promptCommand(); continue; }
       if (sub === 'pack') { await packCommand(); continue; }
       if (sub === 'canvas') { await canvasCommand(); continue; }
+      if (sub === 'health') { await healthCommand(); continue; }
       if (sub === 'explain') { await explainCommand(); continue; }
       if (sub === 'rewind') { await rewindCommand(); continue; }
       if (sub === 'checkpoint') { await checkpointCommand(); continue; }
@@ -529,6 +532,15 @@ program
   .option('-j, --json', 'Output structured JSON explanation')
   .action(async (options) => {
     await explainCommand(options);
+  });
+
+program
+  .command('health')
+  .description('Evaluate AI readiness score (0-100), context token density, and run auto-repairs')
+  .option('-f, --fix', 'Automatically repair fixable context and template issues')
+  .option('-j, --json', 'Output structured JSON health report')
+  .action(async (options) => {
+    await healthCommand(options);
   });
 
 program

@@ -122,8 +122,9 @@ The ultimate pre-flight checklist for deploying profitable, production-grade app
 * **Zero-Error Verification Gate**: Runs the project's native build and test suite (`npm run build`, `dotnet build`, etc.).
 * **Deployment Automation**: Scaffolds production multi-stage `Dockerfile` and GitHub Actions CI/CD workflows if missing.
 
-### 💾 13. AI Changes Digest, Panic Button & Rollback Engine (`vibe explain`, `vibe rewind`, `vibe checkpoint`, `vibe rollback`)
-Zero-risk AI coding. Never fear letting an AI write or refactor large files:
+### 💾 13. Vibe Safety, AI Diagnostics & Rollback Engine (`vibe health`, `vibe explain`, `vibe rewind`, `vibe checkpoint`)
+Zero-risk, high-velocity AI coding:
+* **`vibe health`**: Instant AI Readiness Score (0-100) and grade (A+ through Needs Work). Evaluates context window density (`_Context.md` <= 60 lines), live Obsidian NTFS junctions, compiler strictness, oversized source files (>600L), and git status. Pass `--fix` for autonomous non-destructive repairs.
 * **`vibe explain`**: Plain-English digest of uncommitted AI changes. Breaks down added modules, modified lines, and runs a security risk radar (flagging leaked secrets, unconfigured env vars, test deletions, and type slop) so you never have to read raw git diffs.
 * **`vibe rewind`**: 1-click workspace panic button. Detects hallucinated code, resets modified tracked files, and deletes untracked files created by the agent, restoring a clean state with an automatic pre-rewind safety backup.
 * **`vibe checkpoint [label]`**: Creates an atomic snapshot of modified and critical workspace files with git commit hashing in `.vault/Checkpoints/`.
@@ -265,6 +266,7 @@ Now `vibe` is globally accessible anywhere in your terminal!
 | **Fix a build error with AI** | `vibe triage` | Captures compiler errors, extracts broken code line, and copies a surgical AI fix prompt. |
 | **Understand what AI just did** | `vibe explain` | Plain-English summary of uncommitted changes (added, modified, and risk radar). |
 | **Undo AI mistake (Panic button)** | `vibe rewind` | Discards hallucinated AI changes, removes rogue files, and restores clean code. |
+| **Check AI readiness score** | `vibe health` | Scores AI readiness (0-100) and runs non-destructive auto-repairs (`--fix`). |
 | **Save a lesson or gotcha** | `vibe snap "lesson"` | Saves the bug fix or learning straight into your Obsidian Memory Bank. |
 | **Turn scripts into AI tools** | `vibe skill create "intent"` | Synthesizes an AI tool from plain English for Antigravity, OpenCode, Hermes, Claude, and Cursor. |
 | **Route a task to an AI tool** | `vibe route "task"` | Dispatches your natural language request to matching custom skills. |
