@@ -33,6 +33,7 @@ import { canvasCommand } from './commands/canvas.js';
 import { triageCommand } from './commands/triage.js';
 import { apiCommand } from './commands/api.js';
 import { depsCommand } from './commands/deps.js';
+import { guideCommand } from './commands/guide.js';
 import {
   skillCompileCommand,
   skillCreateCommand,
@@ -72,6 +73,7 @@ export async function interactiveMainMenu(): Promise<void> {
         { value: 'topology', label: 'Topology & schemas...', hint: 'map, db, api' },
         { value: 'commercial', label: 'Launch & payments...', hint: 'ship, monetize, mock, env, deps' },
         { value: 'skills', label: 'Skills & ecosystem...', hint: 'route, skill, scan, doctor' },
+        { value: 'guide', label: 'Usage guides & workflows...', hint: 'vibe guide' },
         { value: 'exit', label: 'Exit' },
       ],
     });
@@ -87,6 +89,7 @@ export async function interactiveMainMenu(): Promise<void> {
     if (action === 'snap') { await snapCommand(); return; }
     if (action === 'wrapup') { await wrapupCommand(); return; }
     if (action === 'link') { await linkCommand(); return; }
+    if (action === 'guide') { await guideCommand(); continue; }
 
     if (action === 'ai') {
       const sub = await p.select({
@@ -600,6 +603,14 @@ program
   .option('-f, --fix', 'Automatically run safe security vulnerability remediation')
   .action(async (options) => {
     await depsCommand(options);
+  });
+
+program
+  .command('guide')
+  .description('View in-terminal usage guides and workflow documentation')
+  .argument('[topic]', 'Topic: quickstart | daily | architecture | topology | launch | skills | all')
+  .action(async (topic) => {
+    await guideCommand(topic);
   });
 
 program.parse();

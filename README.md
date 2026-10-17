@@ -214,39 +214,114 @@ Now `vibe` is globally accessible anywhere in your terminal!
 
 ---
 
-## 🎮 Usage & Command Cheatsheet
+---
 
-### 1. Interactive Terminal UI (TUI)
-Just type `vibe` with no arguments to launch the visual menu:
+## 📖 How to Use `vibe-cli`
+
+### 1. In-Terminal Interactive UI & Built-In Guides
+
+Run `vibe` with no arguments from any terminal to open the clean navigation menu:
 
 ```powershell
 vibe
 ```
 
-Use `↑` / `↓` arrow keys to navigate and `Enter` to select:
+```text
+  vibe v1.1.0 · workspace & vault manager
+  dir: my-app | vault: Dev-Vault | projects: 1 linked
+
+◆  Action or workspace:
+│  ● Dev server                   vibe dev
+│  ○ Verify build & tests         vibe check
+│  ○ Triage failure               vibe triage
+│  ○ Log lesson note              vibe snap
+│  ○ Wrap up session              vibe wrapup
+│  ○ Link project to vault        vibe link
+│  ○ Architecture & specs...      clarify, spec, prompt, pack, canvas
+│  ○ Topology & schemas...        map, db, api
+│  ○ Launch & payments...         ship, monetize, mock, env, deps
+│  ○ Skills & ecosystem...        route, skill, scan, doctor
+│  ○ Usage guides & workflows...  vibe guide
+│  ○ Exit
 ```
-┌  vibe  Multi-Vault Obsidian Orchestrator & Vibe Assistant
-│
-◇  What would you like to do?
-│  ● 🔗 Link a Project to Obsidian
-│  ○ 🔍 Bulk Scan Projects Directory
-│  ○ 🚀 Launch Dev Server
-│  ○ 🧠 Snap a Lesson / Gotcha to Obsidian
-│  ○ ✅ Verify Codebase
-│  ○ 📦 Wrap Up Session
-│  ○ 🔄 Sync Junctions & Portfolio
-│  ○ 📂 Manage Obsidian Vaults
-│  ○ 🩺 Run Health Diagnostic
-└
+
+You can also read interactive step-by-step guides directly inside your terminal anytime:
+
+```powershell
+# Open interactive guide picker
+vibe guide
+
+# Or jump directly to a specific workflow guide
+vibe guide quickstart
+vibe guide daily
+vibe guide architecture
+vibe guide topology
+vibe guide launch
+vibe guide skills
 ```
 
 ---
 
-### 2. Command Reference
+### 2. Practical Developer Workflows
+
+#### Workflow 1: Quickstart & Project Setup
+Connect any repository to your central Obsidian vault in seconds:
+```powershell
+cd C:\Users\ACER\Documents\Projects\my-app
+vibe link
+```
+- Auto-detects tech stack (Next.js, React, Vite, .NET, Laravel, Flutter, Python, Go).
+- Creates a two-way NTFS directory junction (`.vault/`) pointing into your Obsidian vault.
+- Generates `AGENTS.md` and `.vault/_Context.md` so AI coding agents never lose project context.
+
+#### Workflow 2: Daily Development Loop
+Stay in flow state without context-switching between notes and code:
+1. **Launch dev environment**: `vibe dev` (runs the detected server: `npm run dev`, `dotnet watch run`, etc.).
+2. **Verify changes**: `vibe check` (runs detected tests and builds before you commit).
+3. **Triage errors**: If a test or build fails, run `vibe triage`. It parses stack traces across Node, TypeScript, Python, or .NET, isolates the 10-line source snippet with pointer `>>>`, checks your vault for known gotchas, and copies a surgical fix prompt to your clipboard.
+4. **Log learnings**: `vibe snap "Fixed token refresh race condition"` saves the insight directly into Obsidian's `Lessons-and-Gotchas.md`.
+5. **Wrap up session**: `vibe wrapup` archives completed tasks (`- [x]`) and prunes `_Context.md` under 60 lines so future AI prompts stay fast.
+
+#### Workflow 3: Feature Architecture & PRD Specifications
+Eliminate prompt drift and mid-sprint rewrites before writing code:
+1. **Principal Architect Interview**: `vibe clarify "Stripe Subscriptions"` grills you across 5 architectural pillars (persistence, security, failure modes, UI latency, commercial limits) and locks down a complete PRD.
+2. **Scaffold PRD**: `vibe spec "Team Workspaces"` generates feature blueprints in Obsidian.
+3. **Token-dense context**: `vibe pack src/api -s` extracts AST exports, types, and function signatures without bodies, saving 70-80% of tokens and copying the compressed context to your clipboard.
+4. **Interactive Whiteboard**: `vibe canvas` generates a 2D native Obsidian `.canvas` connecting project tasks, architecture diagrams, and database schemas.
+5. **Time-Machine Snapshots**: `vibe checkpoint "Before auth refactor"` creates an atomic file snapshot. If an AI agent hallucination breaks working code, restore immediately with `vibe rollback`.
+
+#### Workflow 4: Codebase Intelligence & Schemas
+Give AI agents deep architectural awareness of your codebase:
+1. **Module Dependency Map**: `vibe map` extracts exported symbols, imports, and endpoints, emitting an interactive Mermaid graph into `.vault/Architecture/Codebase-Map.md`.
+2. **Database ER Diagrams**: `vibe db` parses Prisma or SQL schema files into visual Mermaid entity-relationship diagrams and typed data dictionaries in `.vault/Architecture/Database-Schema.md`.
+3. **OpenAPI 3.0 Documentation**: `vibe api` discovers API routes across Express, Next.js, FastAPI, Laravel, and ASP.NET Core, exporting standard `openapi.json` and `.vault/Architecture/API-Reference.md` with ready-to-run `curl` commands.
+
+#### Workflow 5: Pre-Flight Launch & Commercial Readiness
+Prepare applications for production and monetization:
+1. **Launch Gate**: `vibe ship` audits against leaked staging keys, verifies `robots.txt`, scaffolds GDPR/CCPA Privacy Policy and Terms of Service, and runs build verification.
+2. **Stripe Billing**: `vibe monetize` scaffolds Stripe Checkout routes, cryptographic webhook handlers, and a modern React pricing table component.
+3. **Mock REST API**: `vibe mock --port 4000 --delay 150 --chaos 0.05` launches a zero-dependency local HTTP API server with in-memory CRUD, CORS, and latency simulation.
+4. **Environment Audit**: `vibe env --sync` compares `.env` vs `.env.example`, alerts on leaked production credentials, and appends missing keys with safe placeholders.
+5. **Dependency Audit**: `vibe deps --fix` audits package manifests against CVE advisories and outdated packages with optional automated remediation.
+6. **Conventional Commit**: `vibe commit` analyzes git diffs, drafts conventional commit messages (`feat`, `fix`, `refactor`), and updates `CHANGELOG.md`.
+
+#### Workflow 6: Custom AI Skills & Tool Routing
+Build and deploy deterministic AI tools:
+1. **Compile tools**: `vibe skill compile ./scripts/backup.py -t all` generates tools for Google Antigravity, MCP stdio server, Cursor, and JSON schemas with path traversal and SSRF shields.
+2. **Synthesize tool**: `vibe skill create "Flush Redis cache keys matching pattern"` creates a guarded skill from natural language.
+3. **Ingest API**: `vibe skill from-api ./swagger.json` converts OpenAPI specifications into guarded AI agent tools.
+4. **Safety sandbox**: `vibe skill test ./skills/db-cleaner` tests tools against security attack payloads.
+5. **Install to agents**: `vibe skill install ./skills/db-cleaner` wires tools into Claude Desktop, Antigravity, and Cursor.
+6. **Tool Switchboard**: `vibe route "purge expired sessions"` routes natural language intents directly to matching tools, or `vibe route --server` runs as a unified stdio MCP server.
+
+---
+
+### 3. Command Reference
 
 | Command | Description | Example |
 | :--- | :--- | :--- |
 | `vibe` | Opens the interactive main dashboard menu | `vibe` |
+| `vibe guide [topic]` | In-terminal workflow guides: quickstart, daily, architecture, topology, launch, skills | `vibe guide` or `vibe guide daily` |
 | `vibe link [path]` | Auto-detects and wires a project codebase to an Obsidian vault | `vibe link` or `vibe link "D:\Code\App" --browse` |
 | `vibe scan [rootDir]` | Bulk scans folder for unlinked projects and batch-wires them | `vibe scan` or `vibe scan --all` |
 | `vibe init [name]` | Scaffolds a new project folder and wires it to Obsidian | `vibe init my-new-app` |
