@@ -30,6 +30,9 @@ import { packCommand } from './commands/pack.js';
 import { commitCommand } from './commands/commit.js';
 import { envCommand } from './commands/env.js';
 import { canvasCommand } from './commands/canvas.js';
+import { triageCommand } from './commands/triage.js';
+import { apiCommand } from './commands/api.js';
+import { depsCommand } from './commands/deps.js';
 import {
   skillCompileCommand,
   skillCreateCommand,
@@ -68,211 +71,162 @@ export async function interactiveMainMenu(): Promise<void> {
     'Status Dashboard'
   );
 
-  const action = await p.select({
-    message: 'What would you like to do? (Use arrow keys ↑/↓, Enter to select):',
+  const category = await p.select({
+    message: 'Select Workspace Category (Use ↑/↓, Enter to select):',
     options: [
       {
-        value: 'link',
-        label: '🔗 Link Current or Selected Project to Obsidian',
-        hint: 'Auto-detect stack, wire junctions, generate notes',
+        value: 'daily',
+        label: '🚀 Daily Flow & Codebase',
+        hint: 'Dev, Check, Triage, Snap gotchas, Wrapup, Checkpoints',
       },
       {
-        value: 'scan',
-        label: '🔍 Bulk Scan Projects Directory',
-        hint: 'Find all unlinked projects and batch-wire them',
+        value: 'ai',
+        label: '🧠 AI Architecture & Prompting',
+        hint: 'Feature Clarify, PRD Spec, Master Prompt, Context Pack, 2D Canvas',
       },
       {
-        value: 'new-vault',
-        label: '➕ Create / Add a New Obsidian Vault',
-        hint: 'Scaffold a new vault or browse for one on PC',
+        value: 'topology',
+        label: '🗺️ Codebase & Data Topology',
+        hint: 'Module AST Map, Database ER Diagram, OpenAPI 3.0 Exporter',
       },
       {
-        value: 'prompt',
-        label: '📋 Generate AI Master Prompt (vibe prompt)',
-        hint: 'Synthesize context & copy anti-slop prompt to clipboard',
+        value: 'commercial',
+        label: '🚢 Commercial Launch & Revenue',
+        hint: 'Ship Gate, Stripe Monetize, Mock API Server, Env Sentinel, Commit, Deps, Audit',
       },
       {
-        value: 'clarify',
-        label: '🧠 Architect Feature Interview (vibe clarify)',
-        hint: 'Grill requirements & generate locked architectural PRD',
-      },
-      {
-        value: 'spec',
-        label: '📐 Architect Feature PRD & Spec (vibe spec)',
-        hint: 'Generate production feature blueprint in Obsidian',
-      },
-      {
-        value: 'ship',
-        label: '🚢 Launchpad & Commercial Ship Gate (vibe ship)',
-        hint: 'Verify secrets, SEO, legal GDPR policies & deployment',
-      },
-      {
-        value: 'audit',
-        label: '🛡️  Run Production & Commercial Audit (vibe audit)',
-        hint: 'Score readiness across security, payments, and UX',
-      },
-      {
-        value: 'route',
-        label: '🧭 OmniRoute AI Tool Switchboard (vibe route)',
-        hint: 'Universal gateway & semantic intent dispatcher for skills',
-      },
-      {
-        value: 'checkpoint',
-        label: '💾 Time-Machine Checkpoint (vibe checkpoint)',
-        hint: 'Instant workspace snapshot before AI edits',
-      },
-      {
-        value: 'rollback',
-        label: '⏪ Rollback Workspace (vibe rollback)',
-        hint: 'Restore workspace to previous stable checkpoint',
-      },
-      {
-        value: 'map',
-        label: '🗺️ Codebase Topology & AST Grapher (vibe map)',
-        hint: 'Extract module dependencies, exports, and API routes',
-      },
-      {
-        value: 'monetize',
-        label: '💳 Scaffold Stripe Billing (vibe monetize)',
-        hint: 'Stripe checkout, webhooks, and pricing table',
-      },
-      {
-        value: 'mock',
-        label: '🧪 Mock REST API Server (vibe mock)',
-        hint: 'Zero-dependency local HTTP API server with CORS',
-      },
-      {
-        value: 'db',
-        label: '🗄️ Database & Schema Visualizer (vibe db)',
-        hint: 'Generate ER diagram & table dictionary in Obsidian',
-      },
-      {
-        value: 'pack',
-        label: '🪶 Token-Optimized Context Packer (vibe pack)',
-        hint: 'Compress source code into token-dense AST signatures',
-      },
-      {
-        value: 'commit',
-        label: '📝 Semantic Conventional Commit (vibe commit)',
-        hint: 'Analyze diff and write conventional commits',
-      },
-      {
-        value: 'env',
-        label: '🔒 Environment & Secret Sentinel (vibe env)',
-        hint: 'Diff .env vs .env.example and shield leaks',
-      },
-      {
-        value: 'canvas',
-        label: '🎨 Native Obsidian Visual Canvas (vibe canvas)',
-        hint: 'Generate 2D interactive whiteboard canvas',
-      },
-      {
-        value: 'skill',
-        label: '⚡ Multi-Target AI Skill Compiler (vibe skill)',
-        hint: 'Compile scripts into Antigravity, MCP, Cursor & OpenAI skills',
-      },
-      {
-        value: 'dev',
-        label: '🚀 Launch Dev Server (vibe dev)',
-        hint: 'Runs the right dev command for this project',
-      },
-      {
-        value: 'check',
-        label: '✅ Verify Codebase (vibe check)',
-        hint: 'Run build / type check / tests',
-      },
-      {
-        value: 'snap',
-        label: '🧠 Snap a Lesson / Gotcha to Obsidian (vibe snap)',
-        hint: 'Quickly log insight into Memory Bank',
-      },
-      {
-        value: 'wrapup',
-        label: '📦 Wrap Up Session (vibe wrapup)',
-        hint: 'Archive completed tasks and prune context to <= 60 lines',
-      },
-      {
-        value: 'sync',
-        label: '🔄 Sync Junctions & Portfolio (vibe sync)',
-        hint: 'Heal broken links and publish showcase projects',
-      },
-      {
-        value: 'vault',
-        label: '📂 Manage Obsidian Vaults',
-        hint: 'Create, list, or switch vaults',
-      },
-      {
-        value: 'doctor',
-        label: '🩺 Run Health Diagnostic (vibe doctor)',
-        hint: 'Check Node, Git, .NET, Flutter, PHP, Python toolchains',
+        value: 'skills',
+        label: '⚡ AI Agent Skills & Obsidian Hub',
+        hint: 'OmniRoute Switchboard, Skill Compiler, Vault Manager, Link, Scan, Sync, Doctor',
       },
     ],
   });
 
-  if (p.isCancel(action)) {
+  if (p.isCancel(category)) {
     p.cancel('Goodbye!');
     return;
   }
 
-  switch (action) {
-    case 'link':
-      await linkCommand();
-      break;
-    case 'scan':
-      await scanCommand();
-      break;
-    case 'new-vault':
-      await vaultCreateCommand();
-      break;
-    case 'prompt':
-      await promptCommand();
-      break;
-    case 'clarify':
-      await clarifyCommand();
-      break;
-    case 'spec':
-      await specCommand();
-      break;
-    case 'ship':
-      await shipCommand();
-      break;
-    case 'audit':
-      await auditCommand();
-      break;
-    case 'route':
-      await routeCommand();
-      break;
-    case 'checkpoint':
-      await checkpointCommand();
-      break;
-    case 'rollback':
-      await rollbackCommand();
-      break;
-    case 'map':
-      await mapCommand();
-      break;
-    case 'monetize':
-      await monetizeCommand();
-      break;
-    case 'mock':
-      await mockCommand();
-      break;
-    case 'db':
-      await dbCommand();
-      break;
-    case 'pack':
-      await packCommand();
-      break;
-    case 'commit':
-      await commitCommand();
-      break;
-    case 'env':
-      await envCommand();
-      break;
-    case 'canvas':
-      await canvasCommand();
-      break;
-    case 'skill': {
+  if (category === 'daily') {
+    const act = await p.select({
+      message: 'Daily Flow Action:',
+      options: [
+        { value: 'dev', label: '🚀 Launch Dev Server (vibe dev)', hint: 'Runs auto-detected dev server' },
+        { value: 'check', label: '✅ Verify Codebase (vibe check)', hint: 'Runs tests and builds' },
+        { value: 'triage', label: '🩺 AI Failure Triage & Self-Healing (vibe triage)', hint: 'Extracts error stack & copies surgical fix prompt' },
+        { value: 'checkpoint', label: '💾 Time-Machine Checkpoint (vibe checkpoint)', hint: 'Instant workspace snapshot before AI edits' },
+        { value: 'rollback', label: '⏪ Rollback Workspace (vibe rollback)', hint: 'Restore previous stable checkpoint' },
+        { value: 'snap', label: '🧠 Snap a Lesson / Gotcha (vibe snap)', hint: 'Log insight into Obsidian Memory Bank' },
+        { value: 'wrapup', label: '📦 Wrap Up Session (vibe wrapup)', hint: 'Archive completed tasks and prune context' },
+      ],
+    });
+    if (p.isCancel(act)) return;
+    if (act === 'dev') await devCommand();
+    if (act === 'check') await checkCommand();
+    if (act === 'triage') await triageCommand();
+    if (act === 'checkpoint') await checkpointCommand();
+    if (act === 'rollback') await rollbackCommand();
+    if (act === 'snap') await snapCommand();
+    if (act === 'wrapup') await wrapupCommand();
+    return;
+  }
+
+  if (category === 'ai') {
+    const act = await p.select({
+      message: 'AI Architecture Action:',
+      options: [
+        { value: 'clarify', label: '🧠 Architect Feature Interview (vibe clarify)', hint: '5-pillar interview locking down PRD' },
+        { value: 'spec', label: '📐 Architect Feature PRD & Spec (vibe spec)', hint: 'Generate feature blueprint in Obsidian' },
+        { value: 'prompt', label: '📋 Generate AI Master Prompt (vibe prompt)', hint: 'Synthesize context & copy anti-slop prompt' },
+        { value: 'pack', label: '🪶 Token-Optimized Context Packer (vibe pack)', hint: 'Compress AST signatures to clipboard' },
+        { value: 'canvas', label: '🎨 Native Obsidian Visual Canvas (vibe canvas)', hint: 'Generate 2D interactive whiteboard' },
+      ],
+    });
+    if (p.isCancel(act)) return;
+    if (act === 'clarify') await clarifyCommand();
+    if (act === 'spec') await specCommand();
+    if (act === 'prompt') await promptCommand();
+    if (act === 'pack') await packCommand();
+    if (act === 'canvas') await canvasCommand();
+    return;
+  }
+
+  if (category === 'topology') {
+    const act = await p.select({
+      message: 'Codebase & Data Topology Action:',
+      options: [
+        { value: 'map', label: '🗺️ Codebase Topology & AST Grapher (vibe map)', hint: 'Extract module dependencies & Mermaid graph' },
+        { value: 'db', label: '🗄️ Database & Schema Visualizer (vibe db)', hint: 'Generate living ER diagram in Obsidian' },
+        { value: 'api', label: '🌐 OpenAPI 3.0 & cURL Exporter (vibe api)', hint: 'Export OpenAPI JSON & Markdown API docs' },
+      ],
+    });
+    if (p.isCancel(act)) return;
+    if (act === 'map') await mapCommand();
+    if (act === 'db') await dbCommand();
+    if (act === 'api') await apiCommand();
+    return;
+  }
+
+  if (category === 'commercial') {
+    const act = await p.select({
+      message: 'Commercial & Shipping Action:',
+      options: [
+        { value: 'ship', label: '🚢 Launchpad & Commercial Ship Gate (vibe ship)', hint: 'Verify secrets, GDPR legal suite & CI/CD' },
+        { value: 'monetize', label: '💳 Scaffold Stripe Billing (vibe monetize)', hint: 'Stripe checkout, webhooks & pricing table' },
+        { value: 'mock', label: '🧪 Mock REST API Server (vibe mock)', hint: 'Zero-dependency local HTTP API server' },
+        { value: 'env', label: '🔒 Environment & Secret Sentinel (vibe env)', hint: 'Diff .env vs .env.example & shield leaks' },
+        { value: 'commit', label: '📝 Semantic Conventional Commit (vibe commit)', hint: 'Analyze diff & write conventional commits' },
+        { value: 'deps', label: '📦 Dependency & Vulnerability Audit (vibe deps)', hint: 'Scan for CVEs & outdated packages' },
+        { value: 'audit', label: '🛡️  Commercial & Production Readiness Audit (vibe audit)', hint: 'Score readiness across security & payments' },
+      ],
+    });
+    if (p.isCancel(act)) return;
+    if (act === 'ship') await shipCommand();
+    if (act === 'monetize') await monetizeCommand();
+    if (act === 'mock') await mockCommand();
+    if (act === 'env') await envCommand();
+    if (act === 'commit') await commitCommand();
+    if (act === 'deps') await depsCommand();
+    if (act === 'audit') await auditCommand();
+    return;
+  }
+
+  if (category === 'skills') {
+    const act = await p.select({
+      message: 'AI Skills & Ecosystem Action:',
+      options: [
+        { value: 'route', label: '🧭 OmniRoute AI Tool Switchboard (vibe route)', hint: 'Universal gateway & semantic intent dispatcher' },
+        { value: 'skill', label: '⚡ Multi-Target AI Skill Compiler (vibe skill)', hint: 'Compile, test, install, or audit AI skills' },
+        { value: 'link', label: '🔗 Link Project to Obsidian (vibe link)', hint: 'Auto-detect stack, wire junctions, generate notes' },
+        { value: 'scan', label: '🔍 Bulk Scan Projects Directory (vibe scan)', hint: 'Find unlinked projects and batch-wire them' },
+        { value: 'vault', label: '📂 Manage Obsidian Vaults (vibe vault)', hint: 'Create, list, or switch vaults' },
+        { value: 'sync', label: '🔄 Sync Junctions & Portfolio (vibe sync)', hint: 'Heal broken links and publish showcase projects' },
+        { value: 'doctor', label: '🩺 Run Health Diagnostic (vibe doctor)', hint: 'Check toolchain and environment health' },
+      ],
+    });
+    if (p.isCancel(act)) return;
+    if (act === 'route') await routeCommand();
+    if (act === 'link') await linkCommand();
+    if (act === 'scan') await scanCommand();
+    if (act === 'sync') await syncCommand();
+    if (act === 'doctor') await doctorCommand();
+    if (act === 'vault') {
+      const vaultAction = await p.select({
+        message: 'Obsidian Vault Action:',
+        options: [
+          { value: 'list', label: '📋 List Vaults & Linked Projects' },
+          { value: 'create', label: '➕ Create a Brand New Vault' },
+          { value: 'browse', label: '🔍 Browse & Register Existing Vault on PC (GUI)' },
+          { value: 'switch', label: '⭐ Switch Active Default Vault' },
+        ],
+      });
+      if (p.isCancel(vaultAction)) return;
+      if (vaultAction === 'list') await vaultListCommand();
+      if (vaultAction === 'create') await vaultCreateCommand();
+      if (vaultAction === 'browse') await vaultCreateCommand(undefined, { browse: true });
+      if (vaultAction === 'switch') await vaultSwitchCommand();
+    }
+    if (act === 'skill') {
       const skillAction = await p.select({
         message: 'AI Agent Skill Action:',
         options: [
@@ -293,43 +247,8 @@ export async function interactiveMainMenu(): Promise<void> {
       if (skillAction === 'install') await skillInstallCommand();
       if (skillAction === 'audit') await skillAuditCommand();
       if (skillAction === 'list') await skillListCommand();
-      break;
     }
-    case 'dev':
-      await devCommand();
-      break;
-    case 'check':
-      await checkCommand();
-      break;
-    case 'snap':
-      await snapCommand();
-      break;
-    case 'wrapup':
-      await wrapupCommand();
-      break;
-    case 'sync':
-      await syncCommand();
-      break;
-    case 'vault': {
-      const vaultAction = await p.select({
-        message: 'Obsidian Vault Action:',
-        options: [
-          { value: 'list', label: '📋 List Vaults & Linked Projects' },
-          { value: 'create', label: '➕ Create a Brand New Vault' },
-          { value: 'browse', label: '🔍 Browse & Register Existing Vault on PC (GUI)' },
-          { value: 'switch', label: '⭐ Switch Active Default Vault' },
-        ],
-      });
-      if (p.isCancel(vaultAction)) return;
-      if (vaultAction === 'list') await vaultListCommand();
-      if (vaultAction === 'create') await vaultCreateCommand();
-      if (vaultAction === 'browse') await vaultCreateCommand(undefined, { browse: true });
-      if (vaultAction === 'switch') await vaultSwitchCommand();
-      break;
-    }
-    case 'doctor':
-      await doctorCommand();
-      break;
+    return;
   }
 }
 
@@ -722,6 +641,34 @@ program
   .argument('[targetDir]', 'Target project directory (defaults to current dir)')
   .action(async (targetDir) => {
     await canvasCommand(targetDir);
+  });
+
+// 30. vibe triage
+program
+  .command('triage')
+  .description('Run verification suite, capture stack traces, and synthesize surgical fix prompts')
+  .argument('[customCommand]', 'Optional verification command to execute')
+  .action(async (customCommand) => {
+    await triageCommand(customCommand);
+  });
+
+// 31. vibe api
+program
+  .command('api')
+  .description('Export discovered API routes to OpenAPI 3.0 specification and Markdown cURL catalog')
+  .argument('[targetDir]', 'Target project directory (defaults to current dir)')
+  .option('-o, --out <file>', 'Custom output path for openapi.json')
+  .action(async (targetDir, options) => {
+    await apiCommand(targetDir, options);
+  });
+
+// 32. vibe deps
+program
+  .command('deps')
+  .description('Audit cross-platform dependencies, scan for vulnerabilities, and check outdated packages')
+  .option('-f, --fix', 'Automatically run safe security vulnerability remediation')
+  .action(async (options) => {
+    await depsCommand(options);
   });
 
 program.parse();

@@ -166,6 +166,30 @@ Transform your startup codebase into an interactive 2D whiteboard:
 * **Native Obsidian .canvas Generator**: Generates `<Vault>/02-Projects/<name>/Project-Canvas.canvas` with structured visual cards (Project Hub, Active Sprint Tasks, Architecture Map, Database ER Diagram, Memory Bank Lessons).
 * **Connected Directional Edges**: Connects components with colored relational edges for birds-eye architectural clarity.
 
+### 🩺 22. Autonomous AI Failure Triage & Self-Healing (`vibe triage`)
+Eliminate the frustration of deciphering cryptic compile or test stack traces:
+* **Deterministic Trace Extractor**: Executes test or build commands (`npm test`, `dotnet build`, `pytest`, etc.), captures error traces, and pinpoints offending source files, lines, and columns.
+* **Contextual Code Extraction**: Slices lines of source surrounding the crash and correlates known issues from Obsidian's `Lessons-and-Gotchas.md`.
+* **Surgical Fix Synthesis**: Generates an authoritative, anti-hallucination fix prompt and copies it straight to the Windows clipboard for 1-click paste into your AI agent.
+
+### 🌐 23. OpenAPI 3.0 Exporter & cURL Reference (`vibe api`)
+Bridge your codebase topology directly to industry-standard API tooling:
+* **Standards-Compliant OpenAPI 3.0**: Auto-discovers REST endpoints from Express, Next.js, FastAPI, Laravel, and ASP.NET Core, exporting them to `openapi.json`.
+* **Living Markdown API Reference**: Auto-generates `.vault/Architecture/API-Reference.md` inside Obsidian with pre-computed `curl` examples and schema documentation.
+
+### 📦 24. Cross-Platform Supply-Chain & Dependency Auditor (`vibe deps`)
+Keep dependencies clean, secure, and up-to-date across Node, Python, .NET, and PHP:
+* **Automated Audit**: Audits lockfiles and package manifests against known CVE security advisories and outdated package registries.
+* **Automated Remediation**: Pass `--fix` to safely upgrade or remediate vulnerable dependencies automatically.
+
+### 🎛️ 25. 2-Tier Categorized Workspace TUI (`vibe`)
+A beautiful, clutter-free interactive dashboard organizing all 32 commands into 5 focused workspaces:
+* **⚡ Daily Vibe Flow**: Launch dev server, run checks, snap lessons, wrap up sessions, and trigger failure triage.
+* **🧠 AI Architecture & Specs**: Master prompts, Principal Architect interviews, PRDs, context packing, and time-machine checkpoints.
+* **🗺️ Codebase & Data Topology**: Architectural dependency maps, database ER diagrams, and OpenAPI route references.
+* **💳 Commercial Launch & Revenue**: Stripe monetization scaffolding, launchpad gate, audits, and mock REST servers.
+* **⚡ AI Agent Skills & Obsidian Hub**: Multi-target compiler, OmniRoute switchboard, vault manager, and auto-discovery scanner.
+
 ---
 
 ## 📦 Installation & Setup
@@ -243,6 +267,9 @@ Use `↑` / `↓` arrow keys to navigate and `Enter` to select:
 | `vibe commit [msg]` | Analyzes git diff, generates conventional commit, and updates CHANGELOG | `vibe commit` |
 | `vibe env [--sync]` | Audits .env vs .env.example, detects secret leaks, and auto-syncs placeholders | `vibe env --sync` |
 | `vibe canvas [path]` | Generates native Obsidian 2D interactive visual canvas whiteboard | `vibe canvas` |
+| `vibe triage [cmd]` | Autonomous AI failure triage: captures errors, extracts code snippet & copies surgical fix prompt | `vibe triage` or `vibe triage "npm test"` |
+| `vibe api [path]` | Exports standards-compliant OpenAPI 3.0 specification & cURL API Reference to Obsidian | `vibe api` |
+| `vibe deps [--fix]` | Cross-platform dependency security auditor & outdated package scanner | `vibe deps --fix` |
 | `vibe dev` | Launches the auto-detected development server | `vibe dev` |
 | `vibe check` | Runs the auto-detected build/test verification suite | `vibe check` |
 | `vibe snap "<note>"` | Logs a lesson, gotcha, or decision into Obsidian Memory Bank | `vibe snap "Fixed JWT refresh race condition"` |
