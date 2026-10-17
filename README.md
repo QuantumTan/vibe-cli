@@ -195,10 +195,41 @@ A beautiful, clutter-free interactive dashboard organizing all 32 commands into 
 
 ## 📦 Installation & Setup
 
-### Prerequisites
-- [Node.js](https://nodejs.org/) (v20+ recommended)
-- Windows 10/11 (PowerShell available)
-- [Obsidian](https://obsidian.md/) (installed)
+### 📋 Required Software & Prerequisites
+
+#### 1. Core Software (Required)
+
+| Software | Version | Purpose | Download / Check |
+| :--- | :--- | :--- | :--- |
+| **Node.js** | `v20.0.0+` (v22+ LTS recommended) | Runtime for running `vibe` CLI, MCP server multiplexer, and AST parser | [nodejs.org](https://nodejs.org/) (`node -v`) |
+| **npm** | `v9.0.0+` | Package manager (included with Node.js) | Included with Node (`npm -v`) |
+| **Git** | Any modern version | Commit synthesis, branch tracking, diff analysis, and checkpoints | [git-scm.com](https://git-scm.com/) (`git --version`) |
+| **Obsidian** | Latest desktop app | Central knowledge vault, interactive canvases, and AI memory bank | [obsidian.md](https://obsidian.md/) |
+| **Operating System** | Windows 10/11 (PowerShell) | Native NTFS directory junctions and Windows folder dialogs | Windows 10/11 *(macOS & Linux also supported)* |
+
+#### 2. Stack-Dependent Toolchains (Optional)
+Install only what your specific projects use:
+* **Python** (`3.10+`): Needed if building Python apps (FastAPI, Flask) or compiling Python scripts into skills (`python --version`).
+* **.NET SDK** (`8.0+ / 9.0 / 10.0`): Needed for C#, WPF, WinForms, or ASP.NET Core projects (`dotnet --version`).
+* **Flutter SDK** (`3.0+`): Needed for Flutter & Dart cross-platform mobile apps (`flutter --version`).
+* **PHP & Composer** (`8.1+`): Needed for Laravel or PHP fullstack projects (`php -v`, `composer -v`).
+
+#### 3. Compatible AI Coding Editors & Agent Harnesses (Optional)
+`vibe` automatically generates memory bank rules (`AGENTS.md`) and compiles skills for:
+* **Google Antigravity** (`SKILL.md` + standalone runner)
+* **Cursor & Windsurf** (`.cursorrules` & `.windsurfrules`)
+* **Claude Desktop & Claude Code** (`.claude/mcp.json` & `CLAUDE.md`)
+* **OpenCode** (`opencode.json` with permission schemas)
+* **Nous Hermes Agent** (`~/.hermes/skills/` & `<tools>` prompt)
+* **Goose (Block)** (`goose-extension.yaml` & `.goosehints`)
+* **OpenHands, Aider, and Continue.dev**
+
+#### 4. Automatic Environment Diagnostic
+Verify your toolchain and Obsidian connectivity anytime with one command:
+
+```powershell
+vibe doctor
+```
 
 ### Local Global Install
 Clone this repository and link it globally on your machine:

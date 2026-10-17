@@ -21,6 +21,13 @@ Connects your project to an Obsidian vault via NTFS directory junctions.
 AI coding agents (Antigravity, Cursor, Claude) use this live link to read
 project context, memory bank notes, and architecture decisions in real time.
 
+Prerequisites:
+  • Node.js v20+ & npm
+  • Git
+  • Obsidian desktop app
+  • Windows 10/11 (PowerShell) or macOS/Linux
+  (Run 'vibe doctor' anytime to verify your environment)
+
 Simple 3-Step Flow:
   1. Open your terminal in your project directory:
      cd C:\\Users\\ACER\\Documents\\Projects\\my-app
@@ -34,6 +41,7 @@ Simple 3-Step Flow:
      vibe
 
 Everyday Commands:
+  vibe doctor                  Check environment health (Node, Git, Obsidian, SDKs)
   vibe link                    Link current project to default Obsidian vault
   vibe link --browse           Open native Windows folder picker to choose a vault
   vibe link --vault Work-Vault Link to a specific named vault
