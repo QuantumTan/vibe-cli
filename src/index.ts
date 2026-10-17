@@ -23,6 +23,7 @@ import { clarifyCommand } from './commands/clarify.js';
 import { shipCommand } from './commands/ship.js';
 import { checkpointCommand, rollbackCommand } from './commands/checkpoint.js';
 import { rewindCommand } from './commands/rewind.js';
+import { explainCommand } from './commands/explain.js';
 import { mapCommand } from './commands/map.js';
 import { monetizeCommand } from './commands/monetize.js';
 import { mockCommand } from './commands/mock.js';
@@ -101,6 +102,7 @@ export async function interactiveMainMenu(): Promise<void> {
           { value: 'prompt', label: 'Generate context prompt', hint: 'vibe prompt' },
           { value: 'pack', label: 'Pack context signatures', hint: 'vibe pack' },
           { value: 'canvas', label: 'Generate visual canvas', hint: 'vibe canvas' },
+          { value: 'explain', label: 'Explain AI changes & risks', hint: 'vibe explain' },
           { value: 'rewind', label: '1-click AI panic undo (rewind)', hint: 'vibe rewind' },
           { value: 'checkpoint', label: 'Create snapshot checkpoint', hint: 'vibe checkpoint' },
           { value: 'rollback', label: 'Rollback to checkpoint', hint: 'vibe rollback' },
@@ -113,6 +115,7 @@ export async function interactiveMainMenu(): Promise<void> {
       if (sub === 'prompt') { await promptCommand(); continue; }
       if (sub === 'pack') { await packCommand(); continue; }
       if (sub === 'canvas') { await canvasCommand(); continue; }
+      if (sub === 'explain') { await explainCommand(); continue; }
       if (sub === 'rewind') { await rewindCommand(); continue; }
       if (sub === 'checkpoint') { await checkpointCommand(); continue; }
       if (sub === 'rollback') { await rollbackCommand(); continue; }
@@ -516,6 +519,16 @@ program
   .option('-d, --dry-run', 'Preview changes that would be discarded without modifying files')
   .action(async (options) => {
     await rewindCommand(options);
+  });
+
+program
+  .command('explain')
+  .description('Summarize uncommitted AI workspace changes and detect security risks or gotchas')
+  .option('-c, --copy', 'Copy Markdown summary directly to clipboard')
+  .option('-s, --save', 'Save explanation note into .vault/Explanations/')
+  .option('-j, --json', 'Output structured JSON explanation')
+  .action(async (options) => {
+    await explainCommand(options);
   });
 
 program
