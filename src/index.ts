@@ -44,211 +44,182 @@ import {
 } from './commands/skill.js';
 
 export function renderProBanner(): void {
-  const banner = `
-  ${pc.cyan('██╗   ██╗██╗██████╗ ███████╗')}     ${pc.magenta('██████╗██╗     ██╗')}
-  ${pc.cyan('██║   ██║██║██╔══██╗██╔════╝')}    ${pc.magenta('██╔════╝██║     ██║')}
-  ${pc.cyan('██║   ██║██║██████╔╝█████╗  ')}    ${pc.magenta('██║     ██║     ██║')}
-  ${pc.cyan('╚██╗ ██╔╝██║██╔══██╗██╔══╝  ')}    ${pc.magenta('██║     ██║     ██║')}
-   ${pc.cyan('╚████╔╝ ██║██████╔╝███████╗')}    ${pc.magenta('╚██████╗███████╗██║')}
-    ${pc.cyan('╚═══╝  ╚═╝╚═════╝ ╚══════╝')}     ${pc.magenta('╚═════╝╚══════╝╚═╝')}
-  ${pc.bold(pc.white('⚡ PRODUCTION VIBE CODING ENGINE'))} • ${pc.green('MULTI-VAULT OBSIDIAN HUB')}
-  `.trim();
-  console.log('\n' + banner + '\n');
+  console.log(
+    `\n  ${pc.bold(pc.bgCyan(pc.black(' ⚡ VIBE ')))} ${pc.bold(pc.white('Obsidian Hub & AI Coding Engine'))} ${pc.dim('v1.1.0')}`
+  );
 }
 
 export async function interactiveMainMenu(): Promise<void> {
-  renderProBanner();
-
   const config = loadConfig();
   const cwdName = path.basename(process.cwd());
   const vaultName = config.defaultVault;
   const projectCount = config.registeredProjects.length;
 
-  p.note(
-    `Directory:   ${pc.bold(pc.white(cwdName))} (${pc.dim(process.cwd())})\n` +
-      `Active Vault: ${pc.bold(pc.cyan('💎 ' + vaultName))}\n` +
-      `Ecosystem:    ${pc.yellow(String(projectCount))} linked project(s) ready for AI orchestration`,
-    'Status Dashboard'
+  renderProBanner();
+  console.log(
+    `  ${pc.dim('📁')} ${pc.cyan(cwdName)}  ${pc.dim('│')}  ${pc.dim('💎')} ${pc.magenta(vaultName)}  ${pc.dim('│')}  ${pc.dim('⚡')} ${pc.green(projectCount + ' linked project' + (projectCount === 1 ? '' : 's'))}\n`
   );
 
-  const category = await p.select({
-    message: 'Select Workspace Category (Use ↑/↓, Enter to select):',
-    options: [
-      {
-        value: 'daily',
-        label: '🚀 Daily Flow & Codebase',
-        hint: 'Dev, Check, Triage, Snap gotchas, Wrapup, Checkpoints',
-      },
-      {
-        value: 'ai',
-        label: '🧠 AI Architecture & Prompting',
-        hint: 'Feature Clarify, PRD Spec, Master Prompt, Context Pack, 2D Canvas',
-      },
-      {
-        value: 'topology',
-        label: '🗺️ Codebase & Data Topology',
-        hint: 'Module AST Map, Database ER Diagram, OpenAPI 3.0 Exporter',
-      },
-      {
-        value: 'commercial',
-        label: '🚢 Commercial Launch & Revenue',
-        hint: 'Ship Gate, Stripe Monetize, Mock API Server, Env Sentinel, Commit, Deps, Audit',
-      },
-      {
-        value: 'skills',
-        label: '⚡ AI Agent Skills & Obsidian Hub',
-        hint: 'OmniRoute Switchboard, Skill Compiler, Vault Manager, Link, Scan, Sync, Doctor',
-      },
-    ],
-  });
-
-  if (p.isCancel(category)) {
-    p.cancel('Goodbye!');
-    return;
-  }
-
-  if (category === 'daily') {
-    const act = await p.select({
-      message: 'Daily Flow Action:',
+  while (true) {
+    const action = await p.select({
+      message: 'Select action or workspace:',
       options: [
-        { value: 'dev', label: '🚀 Launch Dev Server (vibe dev)', hint: 'Runs auto-detected dev server' },
-        { value: 'check', label: '✅ Verify Codebase (vibe check)', hint: 'Runs tests and builds' },
-        { value: 'triage', label: '🩺 AI Failure Triage & Self-Healing (vibe triage)', hint: 'Extracts error stack & copies surgical fix prompt' },
-        { value: 'checkpoint', label: '💾 Time-Machine Checkpoint (vibe checkpoint)', hint: 'Instant workspace snapshot before AI edits' },
-        { value: 'rollback', label: '⏪ Rollback Workspace (vibe rollback)', hint: 'Restore previous stable checkpoint' },
-        { value: 'snap', label: '🧠 Snap a Lesson / Gotcha (vibe snap)', hint: 'Log insight into Obsidian Memory Bank' },
-        { value: 'wrapup', label: '📦 Wrap Up Session (vibe wrapup)', hint: 'Archive completed tasks and prune context' },
+        { value: 'dev', label: '🚀  Launch Dev Server', hint: 'vibe dev' },
+        { value: 'check', label: '✅  Verify Codebase', hint: 'vibe check' },
+        { value: 'triage', label: '🩺  AI Failure Triage', hint: 'vibe triage' },
+        { value: 'snap', label: '🧠  Snap Lesson to Vault', hint: 'vibe snap' },
+        { value: 'wrapup', label: '📦  Wrap Up Session', hint: 'vibe wrapup' },
+        { value: 'link', label: '🔗  Link Project to Vault', hint: 'vibe link' },
+        { value: 'ai', label: '🧠  AI Architecture & Specs...', hint: 'Clarify, specs, prompt, pack, canvas' },
+        { value: 'topology', label: '🗺️  Codebase & Data Topology...', hint: 'AST map, ER diagram, OpenAPI' },
+        { value: 'commercial', label: '🚢  Commercial & Shipping...', hint: 'Ship gate, Stripe, mock API, deps' },
+        { value: 'skills', label: '⚡  AI Skills & Ecosystem...', hint: 'OmniRoute, compiler, scan, doctor' },
+        { value: 'exit', label: '🚪  Exit' },
       ],
     });
-    if (p.isCancel(act)) return;
-    if (act === 'dev') await devCommand();
-    if (act === 'check') await checkCommand();
-    if (act === 'triage') await triageCommand();
-    if (act === 'checkpoint') await checkpointCommand();
-    if (act === 'rollback') await rollbackCommand();
-    if (act === 'snap') await snapCommand();
-    if (act === 'wrapup') await wrapupCommand();
-    return;
-  }
 
-  if (category === 'ai') {
-    const act = await p.select({
-      message: 'AI Architecture Action:',
-      options: [
-        { value: 'clarify', label: '🧠 Architect Feature Interview (vibe clarify)', hint: '5-pillar interview locking down PRD' },
-        { value: 'spec', label: '📐 Architect Feature PRD & Spec (vibe spec)', hint: 'Generate feature blueprint in Obsidian' },
-        { value: 'prompt', label: '📋 Generate AI Master Prompt (vibe prompt)', hint: 'Synthesize context & copy anti-slop prompt' },
-        { value: 'pack', label: '🪶 Token-Optimized Context Packer (vibe pack)', hint: 'Compress AST signatures to clipboard' },
-        { value: 'canvas', label: '🎨 Native Obsidian Visual Canvas (vibe canvas)', hint: 'Generate 2D interactive whiteboard' },
-      ],
-    });
-    if (p.isCancel(act)) return;
-    if (act === 'clarify') await clarifyCommand();
-    if (act === 'spec') await specCommand();
-    if (act === 'prompt') await promptCommand();
-    if (act === 'pack') await packCommand();
-    if (act === 'canvas') await canvasCommand();
-    return;
-  }
+    if (p.isCancel(action) || action === 'exit') {
+      p.outro(pc.dim('Keep vibing! ⚡'));
+      return;
+    }
 
-  if (category === 'topology') {
-    const act = await p.select({
-      message: 'Codebase & Data Topology Action:',
-      options: [
-        { value: 'map', label: '🗺️ Codebase Topology & AST Grapher (vibe map)', hint: 'Extract module dependencies & Mermaid graph' },
-        { value: 'db', label: '🗄️ Database & Schema Visualizer (vibe db)', hint: 'Generate living ER diagram in Obsidian' },
-        { value: 'api', label: '🌐 OpenAPI 3.0 & cURL Exporter (vibe api)', hint: 'Export OpenAPI JSON & Markdown API docs' },
-      ],
-    });
-    if (p.isCancel(act)) return;
-    if (act === 'map') await mapCommand();
-    if (act === 'db') await dbCommand();
-    if (act === 'api') await apiCommand();
-    return;
-  }
+    // Direct daily flow actions
+    if (action === 'dev') { await devCommand(); return; }
+    if (action === 'check') { await checkCommand(); return; }
+    if (action === 'triage') { await triageCommand(); return; }
+    if (action === 'snap') { await snapCommand(); return; }
+    if (action === 'wrapup') { await wrapupCommand(); return; }
+    if (action === 'link') { await linkCommand(); return; }
 
-  if (category === 'commercial') {
-    const act = await p.select({
-      message: 'Commercial & Shipping Action:',
-      options: [
-        { value: 'ship', label: '🚢 Launchpad & Commercial Ship Gate (vibe ship)', hint: 'Verify secrets, GDPR legal suite & CI/CD' },
-        { value: 'monetize', label: '💳 Scaffold Stripe Billing (vibe monetize)', hint: 'Stripe checkout, webhooks & pricing table' },
-        { value: 'mock', label: '🧪 Mock REST API Server (vibe mock)', hint: 'Zero-dependency local HTTP API server' },
-        { value: 'env', label: '🔒 Environment & Secret Sentinel (vibe env)', hint: 'Diff .env vs .env.example & shield leaks' },
-        { value: 'commit', label: '📝 Semantic Conventional Commit (vibe commit)', hint: 'Analyze diff & write conventional commits' },
-        { value: 'deps', label: '📦 Dependency & Vulnerability Audit (vibe deps)', hint: 'Scan for CVEs & outdated packages' },
-        { value: 'audit', label: '🛡️  Commercial & Production Readiness Audit (vibe audit)', hint: 'Score readiness across security & payments' },
-      ],
-    });
-    if (p.isCancel(act)) return;
-    if (act === 'ship') await shipCommand();
-    if (act === 'monetize') await monetizeCommand();
-    if (act === 'mock') await mockCommand();
-    if (act === 'env') await envCommand();
-    if (act === 'commit') await commitCommand();
-    if (act === 'deps') await depsCommand();
-    if (act === 'audit') await auditCommand();
-    return;
-  }
-
-  if (category === 'skills') {
-    const act = await p.select({
-      message: 'AI Skills & Ecosystem Action:',
-      options: [
-        { value: 'route', label: '🧭 OmniRoute AI Tool Switchboard (vibe route)', hint: 'Universal gateway & semantic intent dispatcher' },
-        { value: 'skill', label: '⚡ Multi-Target AI Skill Compiler (vibe skill)', hint: 'Compile, test, install, or audit AI skills' },
-        { value: 'link', label: '🔗 Link Project to Obsidian (vibe link)', hint: 'Auto-detect stack, wire junctions, generate notes' },
-        { value: 'scan', label: '🔍 Bulk Scan Projects Directory (vibe scan)', hint: 'Find unlinked projects and batch-wire them' },
-        { value: 'vault', label: '📂 Manage Obsidian Vaults (vibe vault)', hint: 'Create, list, or switch vaults' },
-        { value: 'sync', label: '🔄 Sync Junctions & Portfolio (vibe sync)', hint: 'Heal broken links and publish showcase projects' },
-        { value: 'doctor', label: '🩺 Run Health Diagnostic (vibe doctor)', hint: 'Check toolchain and environment health' },
-      ],
-    });
-    if (p.isCancel(act)) return;
-    if (act === 'route') await routeCommand();
-    if (act === 'link') await linkCommand();
-    if (act === 'scan') await scanCommand();
-    if (act === 'sync') await syncCommand();
-    if (act === 'doctor') await doctorCommand();
-    if (act === 'vault') {
-      const vaultAction = await p.select({
-        message: 'Obsidian Vault Action:',
+    // Submenu: AI Architecture & Specs
+    if (action === 'ai') {
+      const sub = await p.select({
+        message: 'AI Architecture & Specs:',
         options: [
-          { value: 'list', label: '📋 List Vaults & Linked Projects' },
-          { value: 'create', label: '➕ Create a Brand New Vault' },
-          { value: 'browse', label: '🔍 Browse & Register Existing Vault on PC (GUI)' },
-          { value: 'switch', label: '⭐ Switch Active Default Vault' },
+          { value: 'clarify', label: '🧠  Architect Feature Interview', hint: 'vibe clarify' },
+          { value: 'spec', label: '📐  Generate Feature PRD Spec', hint: 'vibe spec' },
+          { value: 'prompt', label: '📋  Synthesize Master Prompt', hint: 'vibe prompt' },
+          { value: 'pack', label: '🪶  Token Context Packer', hint: 'vibe pack' },
+          { value: 'canvas', label: '🎨  Obsidian Visual Canvas', hint: 'vibe canvas' },
+          { value: 'checkpoint', label: '💾  Time-Machine Checkpoint', hint: 'vibe checkpoint' },
+          { value: 'rollback', label: '⏪  Rollback Workspace', hint: 'vibe rollback' },
+          { value: 'back', label: '↩️   Back to Main Menu' },
         ],
       });
-      if (p.isCancel(vaultAction)) return;
-      if (vaultAction === 'list') await vaultListCommand();
-      if (vaultAction === 'create') await vaultCreateCommand();
-      if (vaultAction === 'browse') await vaultCreateCommand(undefined, { browse: true });
-      if (vaultAction === 'switch') await vaultSwitchCommand();
+      if (p.isCancel(sub) || sub === 'back') continue;
+      if (sub === 'clarify') { await clarifyCommand(); return; }
+      if (sub === 'spec') { await specCommand(); return; }
+      if (sub === 'prompt') { await promptCommand(); return; }
+      if (sub === 'pack') { await packCommand(); return; }
+      if (sub === 'canvas') { await canvasCommand(); return; }
+      if (sub === 'checkpoint') { await checkpointCommand(); return; }
+      if (sub === 'rollback') { await rollbackCommand(); return; }
     }
-    if (act === 'skill') {
-      const skillAction = await p.select({
-        message: 'AI Agent Skill Action:',
+
+    // Submenu: Codebase & Data Topology
+    if (action === 'topology') {
+      const sub = await p.select({
+        message: 'Codebase & Data Topology:',
         options: [
-          { value: 'compile', label: '📦 Compile Script into AI Agent Skills (Antigravity/MCP/Cursor)' },
-          { value: 'create', label: '✨ Synthesize AI Skill from Natural Language Intent' },
-          { value: 'from-api', label: '🌐 Ingest REST API / OpenAPI Specification into AI Tools' },
-          { value: 'test', label: '🛡️  Run Sandbox Safety & Attack Verification Suite' },
-          { value: 'install', label: '🔌 1-Click Install to Claude Desktop, Antigravity & Cursor' },
-          { value: 'audit', label: '🔍 Audit Skill Security, Schemas & Guardrails' },
-          { value: 'list', label: '📋 List Installed Skills & Active Targets' },
+          { value: 'map', label: '🗺️  Codebase Topology & AST Grapher', hint: 'vibe map' },
+          { value: 'db', label: '🗄️  Database & Schema Visualizer', hint: 'vibe db' },
+          { value: 'api', label: '🌐  OpenAPI 3.0 & cURL Exporter', hint: 'vibe api' },
+          { value: 'back', label: '↩️   Back to Main Menu' },
         ],
       });
-      if (p.isCancel(skillAction)) return;
-      if (skillAction === 'compile') await skillCompileCommand();
-      if (skillAction === 'create') await skillCreateCommand();
-      if (skillAction === 'from-api') await skillFromApiCommand();
-      if (skillAction === 'test') await skillTestCommand();
-      if (skillAction === 'install') await skillInstallCommand();
-      if (skillAction === 'audit') await skillAuditCommand();
-      if (skillAction === 'list') await skillListCommand();
+      if (p.isCancel(sub) || sub === 'back') continue;
+      if (sub === 'map') { await mapCommand(); return; }
+      if (sub === 'db') { await dbCommand(); return; }
+      if (sub === 'api') { await apiCommand(); return; }
     }
-    return;
+
+    // Submenu: Commercial & Shipping
+    if (action === 'commercial') {
+      const sub = await p.select({
+        message: 'Commercial Launch & Shipping:',
+        options: [
+          { value: 'ship', label: '🚢  Launchpad & Commercial Ship Gate', hint: 'vibe ship' },
+          { value: 'monetize', label: '💳  Scaffold Stripe Billing & Pricing', hint: 'vibe monetize' },
+          { value: 'mock', label: '🧪  Mock REST API Server', hint: 'vibe mock' },
+          { value: 'env', label: '🔒  Environment & Secret Sentinel', hint: 'vibe env' },
+          { value: 'commit', label: '📝  Semantic Conventional Commit', hint: 'vibe commit' },
+          { value: 'deps', label: '📦  Dependency & Vulnerability Audit', hint: 'vibe deps' },
+          { value: 'audit', label: '🛡️   Commercial Readiness Audit', hint: 'vibe audit' },
+          { value: 'back', label: '↩️   Back to Main Menu' },
+        ],
+      });
+      if (p.isCancel(sub) || sub === 'back') continue;
+      if (sub === 'ship') { await shipCommand(); return; }
+      if (sub === 'monetize') { await monetizeCommand(); return; }
+      if (sub === 'mock') { await mockCommand(); return; }
+      if (sub === 'env') { await envCommand(); return; }
+      if (sub === 'commit') { await commitCommand(); return; }
+      if (sub === 'deps') { await depsCommand(); return; }
+      if (sub === 'audit') { await auditCommand(); return; }
+    }
+
+    // Submenu: AI Skills & Ecosystem
+    if (action === 'skills') {
+      const sub = await p.select({
+        message: 'AI Skills & Obsidian Ecosystem:',
+        options: [
+          { value: 'route', label: '🧭  OmniRoute AI Tool Switchboard', hint: 'vibe route' },
+          { value: 'skill', label: '⚡  Multi-Target Skill Compiler...', hint: 'vibe skill' },
+          { value: 'scan', label: '🔍  Bulk Scan Projects Directory', hint: 'vibe scan' },
+          { value: 'vault', label: '📂  Manage Obsidian Vaults...', hint: 'vibe vault' },
+          { value: 'sync', label: '🔄  Sync Junctions & Portfolio', hint: 'vibe sync' },
+          { value: 'doctor', label: '🩺  Run Health Diagnostic', hint: 'vibe doctor' },
+          { value: 'back', label: '↩️   Back to Main Menu' },
+        ],
+      });
+      if (p.isCancel(sub) || sub === 'back') continue;
+      if (sub === 'route') { await routeCommand(); return; }
+      if (sub === 'scan') { await scanCommand(); return; }
+      if (sub === 'sync') { await syncCommand(); return; }
+      if (sub === 'doctor') { await doctorCommand(); return; }
+
+      if (sub === 'vault') {
+        const vaultAction = await p.select({
+          message: 'Obsidian Vault Action:',
+          options: [
+            { value: 'list', label: '📋  List Vaults & Linked Projects' },
+            { value: 'create', label: '➕  Create a Brand New Vault' },
+            { value: 'browse', label: '🔍  Browse & Register Existing Vault (GUI)' },
+            { value: 'switch', label: '⭐  Switch Active Default Vault' },
+            { value: 'back', label: '↩️   Back to Skills Menu' },
+          ],
+        });
+        if (p.isCancel(vaultAction) || vaultAction === 'back') continue;
+        if (vaultAction === 'list') { await vaultListCommand(); return; }
+        if (vaultAction === 'create') { await vaultCreateCommand(); return; }
+        if (vaultAction === 'browse') { await vaultCreateCommand(undefined, { browse: true }); return; }
+        if (vaultAction === 'switch') { await vaultSwitchCommand(); return; }
+      }
+
+      if (sub === 'skill') {
+        const skillAction = await p.select({
+          message: 'AI Skill Action:',
+          options: [
+            { value: 'compile', label: '📦  Compile Script into AI Skills (Antigravity/MCP/Cursor)' },
+            { value: 'create', label: '✨  Synthesize AI Skill from Natural Language' },
+            { value: 'from-api', label: '🌐  Ingest REST API / OpenAPI into Tools' },
+            { value: 'test', label: '🛡️   Run Sandbox Safety Verification Suite' },
+            { value: 'install', label: '🔌  1-Click Install to Claude, Antigravity & Cursor' },
+            { value: 'audit', label: '🔍  Audit Skill Security & Guardrails' },
+            { value: 'list', label: '📋  List Installed Skills & Targets' },
+            { value: 'back', label: '↩️   Back to Skills Menu' },
+          ],
+        });
+        if (p.isCancel(skillAction) || skillAction === 'back') continue;
+        if (skillAction === 'compile') { await skillCompileCommand(); return; }
+        if (skillAction === 'create') { await skillCreateCommand(); return; }
+        if (skillAction === 'from-api') { await skillFromApiCommand(); return; }
+        if (skillAction === 'test') { await skillTestCommand(); return; }
+        if (skillAction === 'install') { await skillInstallCommand(); return; }
+        if (skillAction === 'audit') { await skillAuditCommand(); return; }
+        if (skillAction === 'list') { await skillListCommand(); return; }
+      }
+    }
   }
 }
 
