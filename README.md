@@ -122,10 +122,11 @@ The ultimate pre-flight checklist for deploying profitable, production-grade app
 * **Zero-Error Verification Gate**: Runs the project's native build and test suite (`npm run build`, `dotnet build`, etc.).
 * **Deployment Automation**: Scaffolds production multi-stage `Dockerfile` and GitHub Actions CI/CD workflows if missing.
 
-### 💾 13. Instant Time-Machine & Rollback Engine (`vibe checkpoint` & `vibe rollback`)
-Zero-risk AI coding. Snapshot working code before letting agents make complex changes:
+### 💾 13. Instant Time-Machine, Panic Button & Rollback Engine (`vibe rewind`, `vibe checkpoint`, `vibe rollback`)
+Zero-risk AI coding. Never fear letting an AI write or refactor large files:
+* **`vibe rewind`**: 1-click workspace panic button. Detects hallucinated code, resets modified tracked files, and deletes untracked files created by the agent, restoring a clean state with an automatic pre-rewind safety backup.
 * **`vibe checkpoint [label]`**: Creates an atomic snapshot of modified and critical workspace files with git commit hashing in `.vault/Checkpoints/`.
-* **`vibe rollback [id]`**: 1-click restoration to any previous snapshot, instantly rescuing code from AI hallucinations or broken refactors.
+* **`vibe rollback [id]`**: 1-click restoration to any previous snapshot, instantly rescuing code from broken refactors.
 
 ### 🗺️ 14. Codebase Topology & AST Grapher (`vibe map`)
 Gives AI agents deep architectural awareness of module relationships:
@@ -261,6 +262,7 @@ Now `vibe` is globally accessible anywhere in your terminal!
 | **Run your app** | `vibe dev` | Automatically starts the right dev server (Next.js, Vite, .NET, Laravel, etc.). |
 | **Verify your code** | `vibe check` | Runs build, tests, and linter to make sure everything passes. |
 | **Fix a build error with AI** | `vibe triage` | Captures compiler errors, extracts broken code line, and copies a surgical AI fix prompt. |
+| **Undo AI mistake (Panic button)** | `vibe rewind` | Discards hallucinated AI changes, removes rogue files, and restores clean code. |
 | **Save a lesson or gotcha** | `vibe snap "lesson"` | Saves the bug fix or learning straight into your Obsidian Memory Bank. |
 | **Turn scripts into AI tools** | `vibe skill create "intent"` | Synthesizes an AI tool from plain English for Antigravity, OpenCode, Hermes, Claude, and Cursor. |
 | **Route a task to an AI tool** | `vibe route "task"` | Dispatches your natural language request to matching custom skills. |

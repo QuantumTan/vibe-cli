@@ -22,6 +22,7 @@ import { routeCommand } from './commands/route.js';
 import { clarifyCommand } from './commands/clarify.js';
 import { shipCommand } from './commands/ship.js';
 import { checkpointCommand, rollbackCommand } from './commands/checkpoint.js';
+import { rewindCommand } from './commands/rewind.js';
 import { mapCommand } from './commands/map.js';
 import { monetizeCommand } from './commands/monetize.js';
 import { mockCommand } from './commands/mock.js';
@@ -100,6 +101,7 @@ export async function interactiveMainMenu(): Promise<void> {
           { value: 'prompt', label: 'Generate context prompt', hint: 'vibe prompt' },
           { value: 'pack', label: 'Pack context signatures', hint: 'vibe pack' },
           { value: 'canvas', label: 'Generate visual canvas', hint: 'vibe canvas' },
+          { value: 'rewind', label: '1-click AI panic undo (rewind)', hint: 'vibe rewind' },
           { value: 'checkpoint', label: 'Create snapshot checkpoint', hint: 'vibe checkpoint' },
           { value: 'rollback', label: 'Rollback to checkpoint', hint: 'vibe rollback' },
           { value: 'back', label: 'Back to main menu' },
@@ -111,6 +113,7 @@ export async function interactiveMainMenu(): Promise<void> {
       if (sub === 'prompt') { await promptCommand(); continue; }
       if (sub === 'pack') { await packCommand(); continue; }
       if (sub === 'canvas') { await canvasCommand(); continue; }
+      if (sub === 'rewind') { await rewindCommand(); continue; }
       if (sub === 'checkpoint') { await checkpointCommand(); continue; }
       if (sub === 'rollback') { await rollbackCommand(); continue; }
     }
@@ -503,6 +506,16 @@ program
   .argument('[checkpointId]', 'ID of checkpoint to restore')
   .action(async (checkpointId) => {
     await rollbackCommand(checkpointId);
+  });
+
+program
+  .command('rewind')
+  .description('1-click workspace undo & panic button: discard AI hallucinated changes and restore clean state')
+  .option('-h, --hard', 'Force reset all modified and untracked files without prompting')
+  .option('-c, --checkpoint', 'Restore the latest snapshot checkpoint')
+  .option('-d, --dry-run', 'Preview changes that would be discarded without modifying files')
+  .action(async (options) => {
+    await rewindCommand(options);
   });
 
 program
