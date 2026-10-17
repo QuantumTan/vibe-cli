@@ -105,6 +105,7 @@ Natively compile any Python, TypeScript, Bash script, or natural language intent
 Universal gateway and semantic intent dispatcher for all installed skills across your Obsidian vaults:
 * **Natural Language Routing**: Type `vibe route "purge redis cache and drop stale keys"` to automatically discover, score, and execute matching tools across your skills with confidence ranking and parameter extraction.
 * **MCP Server Multiplexer**: Run `vibe route --server` to expose all installed skills dynamically as a unified stdio MCP server for Antigravity, Cursor, and Claude Desktop.
+* **Workspace Skill Registry**: OmniRoute discovers tools in `.vault/Skills/` and `./skills/`. In a fresh project, no tools exist initially. Create your first skill with `vibe skill create` or `vibe skill compile` before routing. If no skills exist when you run `vibe route`, OmniRoute offers to synthesize your intent into a new skill immediately.
 
 ### 🧠 11. Principal Architect Feature Interview (`vibe clarify`)
 Eliminates vague prompts and costly mid-sprint architectural refactors:
@@ -307,12 +308,14 @@ Prepare applications for production and monetization:
 
 #### Workflow 6: Custom AI Skills & Tool Routing
 Build and deploy deterministic AI tools:
-1. **Compile tools**: `vibe skill compile ./scripts/backup.py -t all` generates tools for Google Antigravity, MCP stdio server, Cursor, and JSON schemas with path traversal and SSRF shields.
-2. **Synthesize tool**: `vibe skill create "Flush Redis cache keys matching pattern"` creates a guarded skill from natural language.
-3. **Ingest API**: `vibe skill from-api ./swagger.json` converts OpenAPI specifications into guarded AI agent tools.
-4. **Safety sandbox**: `vibe skill test ./skills/db-cleaner` tests tools against security attack payloads.
-5. **Install to agents**: `vibe skill install ./skills/db-cleaner` wires tools into Claude Desktop, Antigravity, and Cursor.
-6. **Tool Switchboard**: `vibe route "purge expired sessions"` routes natural language intents directly to matching tools, or `vibe route --server` runs as a unified stdio MCP server.
+1. **Understand the Registry**: OmniRoute discovers tools located in `.vault/Skills/` and `./skills/`. In a fresh project, no tools exist until you create or compile one.
+2. **Synthesize tool from intent**: `vibe skill create "Flush Redis cache keys matching pattern"` creates a guarded skill with parameter schemas, safety locks, and an executable runner from natural language.
+3. **Compile existing scripts**: `vibe skill compile ./scripts/backup.py -t all` generates tools for Google Antigravity, MCP stdio server, Cursor, and JSON schemas with path traversal and SSRF shields.
+4. **Ingest API**: `vibe skill from-api ./swagger.json` converts OpenAPI specifications into guarded AI agent tools.
+5. **List installed skills**: `vibe skill list` shows all active skills and their target platforms.
+6. **Safety sandbox**: `vibe skill test ./skills/db-cleaner` tests tools against security attack payloads.
+7. **Install to agents**: `vibe skill install ./skills/db-cleaner` wires tools into Claude Desktop, Antigravity, and Cursor.
+8. **Tool Switchboard**: `vibe route "purge expired sessions"` routes natural language intents directly to matching tools, or `vibe route --server` runs as a unified stdio MCP server.
 
 ---
 

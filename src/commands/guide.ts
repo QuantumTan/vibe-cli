@@ -173,28 +173,38 @@ ${pc.bold('Commercial Launch and Payments')}
 ${pc.bold('Custom Skills and MCP Tool Routing')}
 ----------------------------------
 
-1. Compile any script into agent skills:
-   vibe skill compile ./scripts/backup.py -t all
-   Emits configurations for Google Antigravity (SKILL.md), Model Context Protocol
-   stdio server (mcp.json), Cursor (.cursorrules), and JSON schemas.
+OmniRoute is an AI tool gateway and dispatcher. It matches your prompts to
+custom skills compiled in your Obsidian vault (.vault/Skills/) or ./skills/.
 
-2. Create a skill from natural language:
+Prerequisite: In a fresh project, no tools exist initially. You must compile
+or create at least one skill before routing intents.
+
+1. Create a skill from natural language:
    vibe skill create "Flush Redis cache keys matching pattern"
+   Generates tool schemas, safety guardrails, MCP server, and runner.
+
+2. Compile an existing Python or TypeScript script:
+   vibe skill compile ./scripts/backup.py -t all
+   Extracts functions, types, and docstrings into multi-target skill definitions.
 
 3. Ingest OpenAPI into guarded tools:
    vibe skill from-api ./swagger.json
 
-4. Test skill security sandbox:
+4. List installed skills:
+   vibe skill list
+   Shows active skills and their compilation targets.
+
+5. Test skill security sandbox:
    vibe skill test ./skills/db-cleaner
    Runs attack payloads testing path traversal, SSRF, and destructive write locks.
 
-5. Install skill to agent clients:
+6. Install skill to agent clients:
    vibe skill install ./skills/db-cleaner
    One-command installation into Claude Desktop, Antigravity, and Cursor configs.
 
-6. Route natural language to tools:
+7. Route natural language to tools:
    vibe route "purge expired user sessions"
-   Or run as a persistent stdio MCP server for agent clients:
+   Or run as a persistent stdio MCP multiplexer for agent clients:
    vibe route --server
 `.trim(),
   },

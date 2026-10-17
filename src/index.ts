@@ -479,7 +479,7 @@ program
 program
   .command('route')
   .description('OmniRoute Universal AI Tool Gateway & semantic intent dispatcher')
-  .argument('[intent...]', 'Task or intent to route to installed AI skills')
+  .argument('[intent...]', 'Task or intent to route to installed AI skills (.vault/Skills/ or ./skills/)')
   .option('-s, --server', 'Run OmniRoute as a stdio MCP Server multiplexer')
   .option('-d, --dry-run', 'Preview matched tools without executing')
   .action(async (intentParts, options) => {

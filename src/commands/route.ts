@@ -6,6 +6,7 @@ import {
   executeRoutedTool,
   startOmniRouteMcpServer,
 } from '../skills/omniroute.js';
+import { skillCreateCommand } from './skill.js';
 
 export interface RouteOptions {
   server?: boolean;
@@ -27,8 +28,27 @@ export async function routeCommand(
 
   p.intro(pc.bgCyan(pc.black(' vibe route ')) + ' ' + pc.bold('OmniRoute Universal AI Tool Gateway'));
 
+  const allTools = await discoverAllTools();
+
   let intent = intentInput;
   if (!intent) {
+    if (allTools.length === 0) {
+      p.log.warn('No skills discovered in .vault/Skills/ or ./skills/.');
+      p.log.info('OmniRoute dispatches tasks to custom AI skills installed in your workspace.');
+      const shouldCreate = await p.confirm({
+        message: 'No skills are installed yet. Would you like to synthesize one from natural language now?',
+        initialValue: true,
+      });
+
+      if (!p.isCancel(shouldCreate) && shouldCreate) {
+        await skillCreateCommand();
+        return;
+      }
+
+      p.outro('OmniRoute idle. Create a skill using `vibe skill create` or `vibe skill compile`.');
+      return;
+    }
+
     const input = await p.text({
       message: 'Enter task / intent to route across your AI skills:',
       placeholder: 'Clean old database records and purge cache',
@@ -42,13 +62,21 @@ export async function routeCommand(
   const s = p.spinner();
   s.start('Discovering registered tools and computing semantic match...');
 
-  const allTools = await discoverAllTools();
-
   if (allTools.length === 0) {
     s.stop(pc.yellow('No AI tools found.'));
     p.log.warn('No skills discovered in .vault/Skills/ or ./skills/.');
-    p.log.info('Create one using `vibe skill create` or `vibe skill from-api`.');
-    p.outro('OmniRoute idle.');
+    p.log.info('OmniRoute dispatches tasks to custom AI skills installed in your workspace.');
+    const shouldCreate = await p.confirm({
+      message: `Would you like to synthesize "${intent}" as a new AI skill now?`,
+      initialValue: true,
+    });
+
+    if (!p.isCancel(shouldCreate) && shouldCreate) {
+      await skillCreateCommand(intent);
+      return;
+    }
+
+    p.outro('OmniRoute idle. Create a skill using `vibe skill create` or `vibe skill compile`.');
     return;
   }
 
