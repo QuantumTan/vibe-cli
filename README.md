@@ -177,6 +177,10 @@ Use `↑` / `↓` arrow keys to navigate and `Enter` to select:
 | `vibe vault switch [name]` | Changes the active default vault | `vibe vault switch Dev-Vault` |
 | `vibe skill compile [file]` | Compiles scripts into Antigravity, MCP, Cursor, & OpenAI targets | `vibe skill compile ./scripts/db.py -t all` |
 | `vibe skill create [intent]` | Synthesizes a multi-target AI skill from natural language | `vibe skill create "Purge cache keys"` |
+| `vibe skill from-api [spec]` | Ingests OpenAPI/Swagger JSON or URL and compiles guarded tools | `vibe skill from-api ./swagger.json` |
+| `vibe skill test [skill]` | Runs safety attack sandbox (path traversal, SSRF, destructive lock) | `vibe skill test ./skills/db-cleaner` |
+| `vibe skill install [skill]` | 1-click install into Claude Desktop, Antigravity, and Cursor | `vibe skill install ./skills/db-cleaner` |
+| `vibe skill audit [skill]` | Static security, parameter schema, and guardrail audit | `vibe skill audit ./skills/db-cleaner` |
 | `vibe skill list` | Lists installed AI agent skills and their active targets | `vibe skill list` |
 | `vibe doctor` | Multi-platform environment and toolchain health check | `vibe doctor` |
 

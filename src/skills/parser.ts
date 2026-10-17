@@ -379,6 +379,19 @@ export async function parseSkillInput(input: string, sourcePath?: string): Promi
     }
   }
 
+  // 1b. If it's markdown with YAML frontmatter directly
+  if (input.trim().startsWith('---')) {
+    const parsed = matter(input);
+    if (parsed.data.name) {
+      return {
+        name: parsed.data.name,
+        version: parsed.data.version || '1.0.0',
+        description: parsed.data.description || parsed.content.slice(0, 100),
+        tools: parsed.data.tools || [],
+      };
+    }
+  }
+
   // 2. Try JSON parsing directly
   try {
     const parsed = JSON.parse(input);

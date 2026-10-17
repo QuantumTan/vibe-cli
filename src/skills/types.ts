@@ -69,3 +69,39 @@ export interface CompilationResult {
   files: GeneratedFile[];
   warnings: string[];
 }
+
+export interface SkillTestCase {
+  name: string;
+  category: 'path_traversal' | 'ssrf' | 'destructive_lock' | 'dry_run' | 'valid_execution';
+  inputParams: Record<string, any>;
+  expectedOutcome: 'pass' | 'blocked' | 'simulated';
+  actualOutcome?: string;
+  passed: boolean;
+  message?: string;
+}
+
+export interface SkillTestReport {
+  skillName: string;
+  runnerPath: string;
+  totalTests: number;
+  passedTests: number;
+  failedTests: number;
+  success: boolean;
+  cases: SkillTestCase[];
+}
+
+export interface SkillAuditFinding {
+  id: string;
+  category: 'security' | 'schema' | 'guardrails' | 'commercial';
+  level: 'critical' | 'warning' | 'info';
+  message: string;
+  recommendation: string;
+}
+
+export interface SkillAuditReport {
+  skillName: string;
+  score: number; // 0 - 100
+  grade: 'A+' | 'A' | 'B' | 'C' | 'F';
+  toolsCount: number;
+  findings: SkillAuditFinding[];
+}

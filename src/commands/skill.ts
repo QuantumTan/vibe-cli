@@ -5,6 +5,10 @@ import pc from 'picocolors';
 import { compileSkill } from '../skills/compiler.js';
 import { openWindowsFilePicker } from '../gui-picker.js';
 import { SkillTarget, SkillTool } from '../skills/types.js';
+import { testSkill } from '../skills/tester.js';
+import { installSkillToClients } from '../skills/installer.js';
+import { parseOpenAPISpec } from '../skills/openapi.js';
+import { auditSkill } from '../skills/auditor.js';
 
 export interface SkillCompileOptions {
   target?: SkillTarget;
@@ -304,3 +308,328 @@ export async function skillListCommand(): Promise<void> {
   p.note(table, `Installed AI Agent Skills (${skillsFound.length})`);
   p.outro(pc.green('Use `vibe skill compile` to compile additional tools.'));
 }
+
+/**
+ * vibe skill test <skillDir>
+ */
+export async function skillTestCommand(skillDirInput?: string): Promise<void> {
+  p.intro(pc.bgCyan(pc.black(' vibe skill test ')) + ' ' + pc.bold('Skill Sandbox & Guardrail Verification Suite'));
+
+  let targetDir = skillDirInput;
+
+  if (!targetDir) {
+    const cwd = process.cwd();
+    const searchDirs = [path.join(cwd, '.vault', 'Skills'), path.join(cwd, 'skills')];
+    const available: Array<{ label: string; value: string }> = [];
+
+    for (const dir of searchDirs) {
+      if (await fs.pathExists(dir)) {
+        const entries = await fs.readdir(dir, { withFileTypes: true });
+        for (const e of entries) {
+          if (e.isDirectory()) {
+            available.push({ label: e.name, value: path.join(dir, e.name) });
+          }
+        }
+      }
+    }
+
+    if (available.length > 0) {
+      const selected = await p.select({
+        message: 'Select skill to test in sandbox:',
+        options: available,
+      });
+      if (p.isCancel(selected)) return;
+      targetDir = selected as string;
+    } else {
+      const text = await p.text({
+        message: 'Enter path to skill directory:',
+        placeholder: './skills/my-skill',
+        validate: (val) => (!val?.trim() ? 'Path is required' : undefined),
+      });
+      if (p.isCancel(text)) return;
+      targetDir = text.trim();
+    }
+  }
+
+  const s = p.spinner();
+  s.start(`Executing attack simulation and safety sandbox on ${path.basename(targetDir)}...`);
+
+  try {
+    const report = await testSkill(targetDir);
+    s.stop(`Executed ${report.totalTests} sandbox safety assertions.`);
+
+    const rows = report.cases
+      .map((c) => {
+        const badge = c.passed ? pc.green('✔ PASSED') : pc.red('✖ FAILED');
+        return `${badge} ${pc.bold(c.name)}\n   ${pc.dim(c.message || '')}`;
+      })
+      .join('\n\n');
+
+    const statusBanner = report.success
+      ? pc.bgGreen(pc.black(' STATUS: 100% GUARDRAIL SECURED (PASSED) '))
+      : pc.bgRed(pc.white(' STATUS: VULNERABILITY DETECTED (FAILED) '));
+
+    p.note(
+      `${statusBanner}\n\n` +
+        `Skill:       ${pc.cyan(report.skillName)}\n` +
+        `Runner:      ${pc.dim(report.runnerPath)}\n` +
+        `Pass Rate:   ${pc.bold(pc.green(String(report.passedTests)))} / ${report.totalTests} tests passed\n\n` +
+        `Test Suite Results:\n${rows}`,
+      'Skill Sandbox Verification Report'
+    );
+
+    if (report.success) {
+      p.outro(pc.green('✔ Skill verified safe for autonomous AI agent execution!'));
+    } else {
+      p.outro(pc.red('✖ Resolve vulnerabilities before exposing skill to autonomous agents.'));
+    }
+  } catch (err: any) {
+    s.stop(pc.red('Test suite execution failed.'));
+    p.log.error(err.message);
+  }
+}
+
+/**
+ * vibe skill install <skillDir>
+ */
+export async function skillInstallCommand(
+  skillDirInput?: string,
+  options: { all?: boolean; client?: string } = {}
+): Promise<void> {
+  p.intro(pc.bgMagenta(pc.black(' vibe skill install ')) + ' ' + pc.bold('1-Click Client Wire-Up Engine'));
+
+  let targetDir = skillDirInput;
+
+  if (!targetDir) {
+    const cwd = process.cwd();
+    const searchDirs = [path.join(cwd, '.vault', 'Skills'), path.join(cwd, 'skills')];
+    const available: Array<{ label: string; value: string }> = [];
+
+    for (const dir of searchDirs) {
+      if (await fs.pathExists(dir)) {
+        const entries = await fs.readdir(dir, { withFileTypes: true });
+        for (const e of entries) {
+          if (e.isDirectory()) {
+            available.push({ label: e.name, value: path.join(dir, e.name) });
+          }
+        }
+      }
+    }
+
+    if (available.length > 0) {
+      const selected = await p.select({
+        message: 'Select skill to install into AI client:',
+        options: available,
+      });
+      if (p.isCancel(selected)) return;
+      targetDir = selected as string;
+    } else {
+      const text = await p.text({
+        message: 'Enter path to skill directory:',
+        placeholder: './skills/my-skill',
+        validate: (val) => (!val?.trim() ? 'Path is required' : undefined),
+      });
+      if (p.isCancel(text)) return;
+      targetDir = text.trim();
+    }
+  }
+
+  let selectedClients: Array<'claude' | 'antigravity' | 'cursor'> = ['claude', 'antigravity', 'cursor'];
+
+  if (!options.all) {
+    const picked = await p.multiselect({
+      message: 'Select which AI environments to wire this skill into (Space to toggle, Enter to confirm):',
+      options: [
+        { value: 'claude', label: '🔌 Claude Desktop (registers MCP stdio server in claude_desktop_config.json)' },
+        { value: 'antigravity', label: '💎 Google Antigravity (copies to ~/.gemini/antigravity/skills/)' },
+        { value: 'cursor', label: '⚡ Cursor / Windsurf (injects rules into project .cursorrules)' },
+      ],
+      initialValues: ['claude', 'antigravity', 'cursor'],
+    });
+
+    if (p.isCancel(picked)) return;
+    selectedClients = picked as Array<'claude' | 'antigravity' | 'cursor'>;
+  }
+
+  const s = p.spinner();
+  s.start(`Installing ${path.basename(targetDir)} into selected AI environments...`);
+
+  try {
+    const results = await installSkillToClients(targetDir, selectedClients);
+    s.stop('Client installation complete!');
+
+    const summary = results
+      .map((r) => {
+        const badge =
+          r.status === 'installed' || r.status === 'updated'
+            ? pc.green(`✔ ${r.status.toUpperCase()}`)
+            : r.status === 'skipped'
+            ? pc.yellow('○ SKIPPED')
+            : pc.red('✖ FAILED');
+        return `  ${badge} ${pc.bold(r.client.toUpperCase())}: ${r.message}\n     ${pc.dim(r.path || '')}`;
+      })
+      .join('\n\n');
+
+    p.note(summary, 'Client Installation Summary');
+    p.outro(pc.green('✔ Skill is now immediately live in your AI client tools!'));
+  } catch (err: any) {
+    s.stop(pc.red('Installation failed.'));
+    p.log.error(err.message);
+  }
+}
+
+/**
+ * vibe skill from-api <specPathOrUrl>
+ */
+export async function skillFromApiCommand(
+  specInput?: string,
+  options: { target?: SkillTarget; out?: string; browse?: boolean } = {}
+): Promise<void> {
+  p.intro(pc.bgCyan(pc.black(' vibe skill from-api ')) + ' ' + pc.bold('OpenAPI / REST to Guarded Skill Compiler'));
+
+  let specPath = specInput;
+
+  if (options.browse && !specPath) {
+    const picked = await openWindowsFilePicker('Select OpenAPI / Swagger JSON Specification', 'JSON Files (*.json)|*.json|All Files (*.*)|*.*');
+    if (picked) specPath = picked;
+  }
+
+  if (!specPath) {
+    const input = await p.text({
+      message: 'Enter local path or URL to OpenAPI / Swagger JSON specification:',
+      placeholder: 'https://petstore.swagger.io/v2/swagger.json or ./swagger.json',
+      validate: (val) => (!val?.trim() ? 'Spec path or URL is required' : undefined),
+    });
+
+    if (p.isCancel(input)) return;
+    specPath = input.trim();
+  }
+
+  const s = p.spinner();
+  s.start(`Ingesting OpenAPI spec and generating tool definitions...`);
+
+  try {
+    const skillIR = await parseOpenAPISpec(specPath);
+    s.stop(`Discovered ${pc.bold(pc.green(String(skillIR.tools.length)))} API endpoint tools for '${skillIR.name}'!`);
+
+    const target: SkillTarget = options.target || 'all';
+    const cwd = process.cwd();
+    const vaultDir = path.join(cwd, '.vault');
+    const hasVault = await fs.pathExists(vaultDir);
+
+    const outDir =
+      options.out ||
+      (hasVault
+        ? path.join(vaultDir, 'Skills', skillIR.name)
+        : path.join(cwd, 'skills', skillIR.name));
+
+    s.start(`Compiling multi-target outputs with deterministic safety shields...`);
+    const compiled = await compileSkill(JSON.stringify(skillIR), {
+      target,
+      outDir,
+      writeFiles: true,
+    });
+    s.stop(`Compiled ${pc.green(skillIR.name)} with all guardrails injected!`);
+
+    if (hasVault) {
+      await registerSkillInVault(vaultDir, skillIR.name, target, skillIR.tools);
+    }
+
+    p.note(
+      `API Name:     ${pc.cyan(skillIR.name)} (v${skillIR.version})\n` +
+        `Endpoints:    ${pc.yellow(String(skillIR.tools.length))} tools generated\n` +
+        `Output Dir:   ${pc.dim(outDir)}\n` +
+        `Targets:      ${target}\n` +
+        `Artifacts:    ${compiled.files.map((f) => f.relativePath).join(', ')}`,
+      'REST API Skill Build Summary'
+    );
+
+    p.outro(pc.green(`✔ REST API successfully converted into guarded AI agent tools!`));
+  } catch (err: any) {
+    s.stop(pc.red('API ingestion failed.'));
+    p.log.error(err.message);
+  }
+}
+
+/**
+ * vibe skill audit [skillInput]
+ */
+export async function skillAuditCommand(skillInput?: string): Promise<void> {
+  p.intro(pc.bgMagenta(pc.black(' vibe skill audit ')) + ' ' + pc.bold('Static Security & Guardrail Quality Auditor'));
+
+  let target = skillInput;
+
+  if (!target) {
+    const cwd = process.cwd();
+    const searchDirs = [path.join(cwd, '.vault', 'Skills'), path.join(cwd, 'skills')];
+    const available: Array<{ label: string; value: string }> = [];
+
+    for (const dir of searchDirs) {
+      if (await fs.pathExists(dir)) {
+        const entries = await fs.readdir(dir, { withFileTypes: true });
+        for (const e of entries) {
+          if (e.isDirectory()) {
+            available.push({ label: e.name, value: path.join(dir, e.name) });
+          }
+        }
+      }
+    }
+
+    if (available.length > 0) {
+      const selected = await p.select({
+        message: 'Select skill to audit:',
+        options: available,
+      });
+      if (p.isCancel(selected)) return;
+      target = selected as string;
+    } else {
+      const text = await p.text({
+        message: 'Enter path to skill folder or script file:',
+        placeholder: './skills/my-skill',
+        validate: (val) => (!val?.trim() ? 'Path is required' : undefined),
+      });
+      if (p.isCancel(text)) return;
+      target = text.trim();
+    }
+  }
+
+  const s = p.spinner();
+  s.start(`Auditing security, parameter schemas, and guardrail posture...`);
+
+  try {
+    const report = await auditSkill(target);
+    s.stop(`Audit complete! Grade: ${pc.bold(report.grade)} (${report.score}/100)`);
+
+    let gradePill = pc.bgGreen(pc.black(` GRADE: ${report.grade} `));
+    if (report.grade === 'B') gradePill = pc.bgCyan(pc.black(` GRADE: ${report.grade} `));
+    if (report.grade === 'C') gradePill = pc.bgYellow(pc.black(` GRADE: ${report.grade} `));
+    if (report.grade === 'F') gradePill = pc.bgRed(pc.white(` GRADE: ${report.grade} `));
+
+    const findingsText =
+      report.findings.length === 0
+        ? pc.green('✔ Zero vulnerabilities or schema flaws detected! Ready for production.')
+        : report.findings
+            .map((f) => {
+              const badge =
+                f.level === 'critical'
+                  ? pc.red('🔴 CRITICAL')
+                  : f.level === 'warning'
+                  ? pc.yellow('🟡 WARNING')
+                  : pc.cyan('🔵 INFO');
+              return `${badge} [${f.category.toUpperCase()}] ${f.message}\n   Recommendation: ${pc.dim(f.recommendation)}`;
+            })
+            .join('\n\n');
+
+    p.note(
+      `${gradePill}  Score: ${report.score}/100 • Tools: ${report.toolsCount}\n\n` +
+        `Audit Findings:\n${findingsText}`,
+      'Skill Security & Schema Quality Report'
+    );
+
+    p.outro(pc.green('✔ Audit assessment finished.'));
+  } catch (err: any) {
+    s.stop(pc.red('Audit failed.'));
+    p.log.error(err.message);
+  }
+}
+

@@ -18,7 +18,15 @@ import { doctorCommand } from './commands/doctor.js';
 import { auditCommand } from './commands/audit.js';
 import { promptCommand } from './commands/prompt.js';
 import { specCommand } from './commands/spec.js';
-import { skillCompileCommand, skillCreateCommand, skillListCommand } from './commands/skill.js';
+import {
+  skillCompileCommand,
+  skillCreateCommand,
+  skillListCommand,
+  skillTestCommand,
+  skillInstallCommand,
+  skillFromApiCommand,
+  skillAuditCommand,
+} from './commands/skill.js';
 
 export function renderProBanner(): void {
   const banner = `
@@ -154,12 +162,20 @@ export async function interactiveMainMenu(): Promise<void> {
         options: [
           { value: 'compile', label: '📦 Compile Script into AI Agent Skills (Antigravity/MCP/Cursor)' },
           { value: 'create', label: '✨ Synthesize AI Skill from Natural Language Intent' },
+          { value: 'from-api', label: '🌐 Ingest REST API / OpenAPI Specification into AI Tools' },
+          { value: 'test', label: '🛡️  Run Sandbox Safety & Attack Verification Suite' },
+          { value: 'install', label: '🔌 1-Click Install to Claude Desktop, Antigravity & Cursor' },
+          { value: 'audit', label: '🔍 Audit Skill Security, Schemas & Guardrails' },
           { value: 'list', label: '📋 List Installed Skills & Active Targets' },
         ],
       });
       if (p.isCancel(skillAction)) return;
       if (skillAction === 'compile') await skillCompileCommand();
       if (skillAction === 'create') await skillCreateCommand();
+      if (skillAction === 'from-api') await skillFromApiCommand();
+      if (skillAction === 'test') await skillTestCommand();
+      if (skillAction === 'install') await skillInstallCommand();
+      if (skillAction === 'audit') await skillAuditCommand();
       if (skillAction === 'list') await skillListCommand();
       break;
     }
@@ -420,6 +436,42 @@ skillCmd
   .description('List installed AI agent skills and their active compilation targets')
   .action(async () => {
     await skillListCommand();
+  });
+
+skillCmd
+  .command('test')
+  .description('Run automated safety sandbox and attack verification tests on a skill')
+  .argument('[skillDir]', 'Path to the compiled skill folder')
+  .action(async (skillDir) => {
+    await skillTestCommand(skillDir);
+  });
+
+skillCmd
+  .command('install')
+  .description('1-click wire-up of skill into Claude Desktop, Antigravity, and Cursor')
+  .argument('[skillDir]', 'Path to the compiled skill folder')
+  .option('-a, --all', 'Install to all available client environments without prompting')
+  .action(async (skillDir, options) => {
+    await skillInstallCommand(skillDir, options);
+  });
+
+skillCmd
+  .command('from-api')
+  .description('Ingest OpenAPI/Swagger JSON or URL and compile guarded AI agent tools')
+  .argument('[specPathOrUrl]', 'Path or URL to OpenAPI / Swagger JSON specification')
+  .option('-t, --target <target>', 'Target output: antigravity | mcp | cursor | openai | all', 'all')
+  .option('-o, --out <dir>', 'Custom output directory')
+  .option('-b, --browse', 'Browse for specification file with native Windows GUI dialog')
+  .action(async (specPathOrUrl, options) => {
+    await skillFromApiCommand(specPathOrUrl, options);
+  });
+
+skillCmd
+  .command('audit')
+  .description('Run static security, schema quality, and guardrail audit on a skill')
+  .argument('[skillDir]', 'Path to the compiled skill folder or manifest')
+  .action(async (skillDir) => {
+    await skillAuditCommand(skillDir);
   });
 
 program.parse();

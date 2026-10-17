@@ -137,3 +137,92 @@ describe('Skill Multi-Target Compiler', () => {
     expect(skillMd?.content).toContain('## Security & Guardrail Policy');
   });
 });
+
+describe('OpenAPI to Skill Ingestion', () => {
+  it('parses OpenAPI endpoints into guarded AI tools', async () => {
+    const { parseOpenAPISpec } = await import('../src/skills/openapi.js');
+
+    const sampleSpec = JSON.stringify({
+      openapi: '3.0.0',
+      info: { title: 'Payment API', version: '1.0.0' },
+      paths: {
+        '/charges': {
+          get: {
+            summary: 'List charges',
+            parameters: [{ name: 'limit', in: 'query', schema: { type: 'integer' } }],
+          },
+          post: {
+            summary: 'Create a charge',
+            requestBody: {
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    required: ['amount'],
+                    properties: {
+                      amount: { type: 'integer', description: 'Amount in cents' },
+                      currency: { type: 'string', default: 'usd' },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        '/charges/{id}': {
+          delete: {
+            summary: 'Cancel a charge',
+            parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+          },
+        },
+      },
+    });
+
+    const skill = await parseOpenAPISpec(sampleSpec);
+    expect(skill.name).toBe('payment-api');
+    expect(skill.tools.length).toBe(3);
+
+    const deleteTool = skill.tools.find((t) => t.name.startsWith('delete'));
+    expect(deleteTool).toBeDefined();
+    expect(deleteTool?.riskLevel).toBe('destructive_write');
+    expect(deleteTool?.parameters.required).toContain('confirm');
+
+    const postTool = skill.tools.find((t) => t.name.startsWith('post'));
+    expect(postTool?.parameters.properties['amount']).toBeDefined();
+    expect(postTool?.parameters.properties['amount'].type).toBe('integer');
+  });
+});
+
+describe('Skill Security & Quality Auditor', () => {
+  it('computes quality score and flags vulnerabilities', async () => {
+    const { auditSkill } = await import('../src/skills/auditor.js');
+
+    const sampleManifest = `---
+name: vulnerable-skill
+version: 1.0.0
+description: Sample test
+tools:
+  - id: delete_all
+    name: delete_all
+    description: Wipe records
+    riskLevel: destructive_write
+    parameters:
+      type: object
+      properties:
+        target: { type: string }
+      required: [target]
+    execution:
+      type: node
+      code: "const key = 'sk-123456789012345678901234';"
+    guardrails: {}
+---
+# Vulnerable
+`;
+
+    const report = await auditSkill(sampleManifest);
+    expect(report.score).toBeLessThan(70);
+    expect(report.grade).not.toBe('A+');
+    expect(report.findings.some((f) => f.id.includes('missing-confirm'))).toBe(true);
+    expect(report.findings.some((f) => f.id.includes('hardcoded-secret'))).toBe(true);
+  });
+});
