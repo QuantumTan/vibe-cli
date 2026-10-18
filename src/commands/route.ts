@@ -8,9 +8,14 @@ import {
 } from '../skills/omniroute.js';
 import { skillCreateCommand } from './skill.js';
 
+import { quotaCommand } from './quota.js';
+import { selectOptimalProvider } from '../core/quota-ledger.js';
+import { estimateTokens } from '../utils/token-estimator.js';
+
 export interface RouteOptions {
   server?: boolean;
   dryRun?: boolean;
+  status?: boolean;
 }
 
 /**
@@ -20,6 +25,11 @@ export async function routeCommand(
   intentInput?: string,
   options: RouteOptions = {}
 ): Promise<void> {
+  if (options.status) {
+    await quotaCommand();
+    return;
+  }
+
   // If server mode requested, launch MCP multiplexer
   if (options.server) {
     await startOmniRouteMcpServer();

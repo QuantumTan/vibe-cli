@@ -23,7 +23,7 @@ import { clarifyCommand } from './commands/clarify.js';
 import { shipCommand } from './commands/ship.js';
 import { checkpointCommand, rollbackCommand } from './commands/checkpoint.js';
 import { rewindCommand } from './commands/rewind.js';
-import { explainCommand } from './commands/explain.js';
+import { explainCommand, learnCommand } from './commands/explain.js';
 import { healthCommand } from './commands/health.js';
 import { mapCommand } from './commands/map.js';
 import { monetizeCommand } from './commands/monetize.js';
@@ -39,6 +39,11 @@ import { depsCommand } from './commands/deps.js';
 import { guideCommand } from './commands/guide.js';
 import { rulesCommand } from './commands/rules.js';
 import { tunnelCommand } from './commands/tunnel.js';
+import { stateCommand, stateSaveCommand, stateRestoreCommand } from './commands/state.js';
+import { quotaCommand } from './commands/quota.js';
+import { modelsCommand } from './commands/models.js';
+import { microCommand } from './commands/micro.js';
+import { rubricCommand } from './commands/rubric.js';
 import {
   skillCompileCommand,
   skillCreateCommand,
@@ -50,7 +55,7 @@ import {
 } from './commands/skill.js';
 
 export function renderProBanner(): void {
-  console.log(`\n  ${pc.bold('vibe')} ${pc.dim('v1.1.0')} ${pc.dim('·')} ${pc.dim('workspace & vault manager')}`);
+  console.log(`\n  ${pc.bold('vibe')} ${pc.dim('v2.0.0')} ${pc.dim('·')} ${pc.green('zero-budget student edition')}`);
 }
 
 export async function interactiveMainMenu(): Promise<void> {
@@ -70,15 +75,16 @@ export async function interactiveMainMenu(): Promise<void> {
       options: [
         { value: 'dev', label: 'Dev server', hint: 'vibe dev' },
         { value: 'check', label: 'Verify build & tests', hint: 'vibe check' },
-        { value: 'triage', label: 'Triage failure', hint: 'vibe triage' },
-        { value: 'snap', label: 'Log lesson note', hint: 'vibe snap' },
-        { value: 'wrapup', label: 'Wrap up session', hint: 'vibe wrapup' },
-        { value: 'link', label: 'Link project to vault', hint: 'vibe link' },
-        { value: 'ai', label: 'Architecture & specs...', hint: 'clarify, spec, prompt, pack, canvas' },
-        { value: 'topology', label: 'Topology & schemas...', hint: 'map, db, api' },
-        { value: 'commercial', label: 'Launch & payments...', hint: 'ship, monetize, mock, env, deps' },
-        { value: 'skills', label: 'Skills & ecosystem...', hint: 'route, skill, scan, doctor' },
-        { value: 'guide', label: 'Usage guides & workflows...', hint: 'vibe guide' },
+        { value: 'micro', label: 'Small-model micro-task loop', hint: 'vibe micro' },
+        { value: 'pack', label: 'Pack context signatures (budget-capped)', hint: 'vibe pack' },
+        { value: 'state', label: 'State & memory controller (save/restore)', hint: 'vibe state' },
+        { value: 'quota', label: 'Free tier quota ledger', hint: 'vibe quota' },
+        { value: 'explain', label: 'Explain changes & viva oral-defense', hint: 'vibe explain / learn' },
+        { value: 'rubric', label: 'Academic assessment rubric', hint: 'vibe rubric' },
+        { value: 'ship', label: 'Zero-credit-card student launch preflight', hint: 'vibe ship --free' },
+        { value: 'link', label: 'Link project to vault (portable)', hint: 'vibe link' },
+        { value: 'doctor', label: 'Hardware probe & local model doctor', hint: 'vibe doctor --student' },
+        { value: 'more', label: 'More tools...', hint: 'spec, route, map, db, api, tunnel, guide' },
         { value: 'exit', label: 'Exit' },
       ],
     });
@@ -90,146 +96,48 @@ export async function interactiveMainMenu(): Promise<void> {
 
     if (action === 'dev') { await devCommand(); continue; }
     if (action === 'check') { await checkCommand(); continue; }
-    if (action === 'triage') { await triageCommand(); continue; }
-    if (action === 'snap') { await snapCommand(); continue; }
-    if (action === 'wrapup') { await wrapupCommand(); continue; }
+    if (action === 'micro') { await microCommand(); continue; }
+    if (action === 'pack') { await packCommand(); continue; }
+    if (action === 'state') { await stateCommand(); continue; }
+    if (action === 'quota') { await quotaCommand(); continue; }
+    if (action === 'explain') { await explainCommand(); continue; }
+    if (action === 'rubric') { await rubricCommand(); continue; }
+    if (action === 'ship') { await shipCommand(undefined, { free: true }); continue; }
     if (action === 'link') { await linkCommand(); continue; }
-    if (action === 'guide') { await guideCommand(); continue; }
+    if (action === 'doctor') { await doctorCommand({ student: true }); continue; }
 
-    if (action === 'ai') {
+    if (action === 'more') {
       const sub = await p.select({
-        message: 'Architecture & specs:',
+        message: 'More tools & diagnostics:',
         options: [
-          { value: 'clarify', label: 'Feature clarify interview', hint: 'vibe clarify' },
-          { value: 'spec', label: 'Generate feature spec', hint: 'vibe spec' },
-          { value: 'prompt', label: 'Generate context prompt', hint: 'vibe prompt' },
-          { value: 'pack', label: 'Pack context signatures', hint: 'vibe pack' },
-          { value: 'canvas', label: 'Generate visual canvas', hint: 'vibe canvas' },
-          { value: 'health', label: 'AI readiness score & health', hint: 'vibe health' },
-          { value: 'explain', label: 'Explain AI changes & risks', hint: 'vibe explain' },
-          { value: 'rewind', label: '1-click AI panic undo (rewind)', hint: 'vibe rewind' },
-          { value: 'checkpoint', label: 'Create snapshot checkpoint', hint: 'vibe checkpoint' },
-          { value: 'rollback', label: 'Rollback to checkpoint', hint: 'vibe rollback' },
-          { value: 'rules', label: 'Cross-agent rules sync (Cursor/Claude/Windsurf)', hint: 'vibe rules' },
-          { value: 'back', label: 'Back to main menu' },
-        ],
-      });
-      if (p.isCancel(sub) || sub === 'back') continue;
-      if (sub === 'clarify') { await clarifyCommand(); continue; }
-      if (sub === 'spec') { await specCommand(); continue; }
-      if (sub === 'prompt') { await promptCommand(); continue; }
-      if (sub === 'pack') { await packCommand(); continue; }
-      if (sub === 'canvas') { await canvasCommand(); continue; }
-      if (sub === 'health') { await healthCommand(); continue; }
-      if (sub === 'explain') { await explainCommand(); continue; }
-      if (sub === 'rewind') { await rewindCommand(); continue; }
-      if (sub === 'checkpoint') { await checkpointCommand(); continue; }
-      if (sub === 'rollback') { await rollbackCommand(); continue; }
-      if (sub === 'rules') { await rulesCommand(); continue; }
-    }
-
-    if (action === 'topology') {
-      const sub = await p.select({
-        message: 'Topology & schemas:',
-        options: [
-          { value: 'map', label: 'Extract dependency map', hint: 'vibe map' },
-          { value: 'db', label: 'Parse database schema', hint: 'vibe db' },
+          { value: 'spec', label: 'Architect feature spec (PRD / prompt)', hint: 'vibe spec' },
+          { value: 'route', label: 'Route intent across skills', hint: 'vibe route' },
+          { value: 'models', label: 'Verified free tier model matrix', hint: 'vibe models' },
+          { value: 'map', label: 'Extract dependency architecture map', hint: 'vibe map' },
+          { value: 'db', label: 'Parse database schema & ER diagram', hint: 'vibe db' },
           { value: 'api', label: 'Export OpenAPI specification', hint: 'vibe api' },
+          { value: 'triage', label: 'Triage test/build failures', hint: 'vibe triage' },
+          { value: 'tunnel', label: 'Instant public tunnel bridge', hint: 'vibe tunnel' },
+          { value: 'env', label: 'Check environment secrets (.env)', hint: 'vibe env' },
+          { value: 'commit', label: 'Create conventional commit', hint: 'vibe commit' },
+          { value: 'wrapup', label: 'Wrap up session (<60 lines)', hint: 'vibe wrapup' },
+          { value: 'guide', label: 'Usage guides & workflows', hint: 'vibe guide' },
           { value: 'back', label: 'Back to main menu' },
         ],
       });
       if (p.isCancel(sub) || sub === 'back') continue;
+      if (sub === 'spec') { await specCommand(); continue; }
+      if (sub === 'route') { await routeCommand(); continue; }
+      if (sub === 'models') { await modelsCommand(); continue; }
       if (sub === 'map') { await mapCommand(); continue; }
       if (sub === 'db') { await dbCommand(); continue; }
       if (sub === 'api') { await apiCommand(); continue; }
-    }
-
-    if (action === 'commercial') {
-      const sub = await p.select({
-        message: 'Launch & payments:',
-        options: [
-          { value: 'ship', label: 'Pre-flight release checks', hint: 'vibe ship' },
-          { value: 'monetize', label: 'Scaffold Stripe billing', hint: 'vibe monetize' },
-          { value: 'tunnel', label: 'Instant public tunnel & webhook relay', hint: 'vibe tunnel' },
-          { value: 'mock', label: 'Start local mock API', hint: 'vibe mock' },
-          { value: 'env', label: 'Check environment variables', hint: 'vibe env' },
-          { value: 'commit', label: 'Create conventional commit', hint: 'vibe commit' },
-          { value: 'deps', label: 'Audit dependencies & CVEs', hint: 'vibe deps' },
-          { value: 'audit', label: 'Run readiness audit', hint: 'vibe audit' },
-          { value: 'back', label: 'Back to main menu' },
-        ],
-      });
-      if (p.isCancel(sub) || sub === 'back') continue;
-      if (sub === 'ship') { await shipCommand(); continue; }
-      if (sub === 'monetize') { await monetizeCommand(); continue; }
+      if (sub === 'triage') { await triageCommand(); continue; }
       if (sub === 'tunnel') { await tunnelCommand(); continue; }
-      if (sub === 'mock') { await mockCommand(); continue; }
       if (sub === 'env') { await envCommand(); continue; }
       if (sub === 'commit') { await commitCommand(); continue; }
-      if (sub === 'deps') { await depsCommand(); continue; }
-      if (sub === 'audit') { await auditCommand(); continue; }
-    }
-
-    if (action === 'skills') {
-      const sub = await p.select({
-        message: 'Skills & ecosystem:',
-        options: [
-          { value: 'route', label: 'Route intent to tool', hint: 'vibe route' },
-          { value: 'skill', label: 'Manage skills...', hint: 'vibe skill' },
-          { value: 'scan', label: 'Scan directory for projects', hint: 'vibe scan' },
-          { value: 'vault', label: 'Manage vaults...', hint: 'vibe vault' },
-          { value: 'sync', label: 'Sync junctions & portfolio', hint: 'vibe sync' },
-          { value: 'doctor', label: 'Run environment diagnostic', hint: 'vibe doctor' },
-          { value: 'back', label: 'Back to main menu' },
-        ],
-      });
-      if (p.isCancel(sub) || sub === 'back') continue;
-      if (sub === 'route') { await routeCommand(); continue; }
-      if (sub === 'scan') { await scanCommand(); continue; }
-      if (sub === 'sync') { await syncCommand(); continue; }
-      if (sub === 'doctor') { await doctorCommand(); continue; }
-
-      if (sub === 'vault') {
-        const vaultAction = await p.select({
-          message: 'Vault action:',
-          options: [
-            { value: 'list', label: 'List vaults & linked projects' },
-            { value: 'create', label: 'Create new vault' },
-            { value: 'browse', label: 'Browse for existing vault' },
-            { value: 'switch', label: 'Set default vault' },
-            { value: 'back', label: 'Back' },
-          ],
-        });
-        if (p.isCancel(vaultAction) || vaultAction === 'back') continue;
-        if (vaultAction === 'list') { await vaultListCommand(); continue; }
-        if (vaultAction === 'create') { await vaultCreateCommand(); continue; }
-        if (vaultAction === 'browse') { await vaultCreateCommand(undefined, { browse: true }); continue; }
-        if (vaultAction === 'switch') { await vaultSwitchCommand(); continue; }
-      }
-
-      if (sub === 'skill') {
-        const skillAction = await p.select({
-          message: 'Skill action:',
-          options: [
-            { value: 'compile', label: 'Compile script into skill' },
-            { value: 'create', label: 'Create skill from description' },
-            { value: 'from-api', label: 'Generate tools from OpenAPI spec' },
-            { value: 'test', label: 'Run sandbox safety tests' },
-            { value: 'install', label: 'Install skill to agent configs' },
-            { value: 'audit', label: 'Audit skill definition' },
-            { value: 'list', label: 'List installed skills' },
-            { value: 'back', label: 'Back' },
-          ],
-        });
-        if (p.isCancel(skillAction) || skillAction === 'back') continue;
-        if (skillAction === 'compile') { await skillCompileCommand(); continue; }
-        if (skillAction === 'create') { await skillCreateCommand(); continue; }
-        if (skillAction === 'from-api') { await skillFromApiCommand(); continue; }
-        if (skillAction === 'test') { await skillTestCommand(); continue; }
-        if (skillAction === 'install') { await skillInstallCommand(); continue; }
-        if (skillAction === 'audit') { await skillAuditCommand(); continue; }
-        if (skillAction === 'list') { await skillListCommand(); continue; }
-      }
+      if (sub === 'wrapup') { await wrapupCommand(); continue; }
+      if (sub === 'guide') { await guideCommand(); continue; }
     }
   }
 }
@@ -238,257 +146,27 @@ const program = new Command();
 
 program
   .name('vibe')
-  .description('Automated Multi-Vault Obsidian Orchestrator, Auto-Discovery Engine & Vibe Coding Assistant')
-  .version('1.1.0');
+  .description('Universal AI Memory Bank & Context Orchestrator (Zero-Budget Student Edition)')
+  .version('2.0.0');
 
 // Default action when run with no arguments: open interactive main menu
 program.action(async () => {
   await interactiveMainMenu();
 });
 
+// 1. Context & Routing
 program
-  .command('link')
-  .description('Auto-detect and wire a project codebase to an Obsidian Vault')
-  .argument('[targetPath]', 'Path to the project folder to wire (optional)')
-  .option('-b, --browse', 'Browse for project folder with native Windows GUI dialog')
-  .option('-v, --vault <vaultName>', 'Target Obsidian Vault name')
-  .option('-s, --showcase', 'Mark project as showcase for portfolio')
-  .option('-f, --force', 'Force overwrite of existing notes')
-  .action(async (targetPath, options) => {
-    await linkCommand(targetPath, options);
-  });
-
-program
-  .command('scan')
-  .description('Scan a parent directory for unlinked projects and batch-wire them')
-  .argument('[rootDir]', 'Root directory to scan (defaults to configured projectsRoot)')
-  .option('-b, --browse', 'Browse for directory to scan with native Windows GUI dialog')
-  .option('-a, --all', 'Wire all unlinked projects without prompting')
-  .option('-v, --vault <vaultName>', 'Target Obsidian Vault name')
-  .option('-f, --force', 'Force overwrite of existing notes')
-  .action(async (rootDir, options) => {
-    await scanCommand(rootDir, options);
-  });
-
-program
-  .command('init')
-  .description('Scaffold a new project directory and wire it to Obsidian')
-  .argument('[projectName]', 'Name of the project to create')
-  .option('-b, --browse', 'Select parent directory with native Windows GUI dialog')
-  .option('-v, --vault <vaultName>', 'Target Obsidian Vault name')
-  .action(async (projectName, options) => {
-    await initCommand(projectName, options);
-  });
-
-program
-  .command('new-vault [vaultName]')
-  .description('Shortcut: Scaffold and register a new Obsidian Vault')
-  .option('-p, --path <path>', 'Custom directory path for vault')
-  .option('-b, --browse', 'Browse for vault folder with native Windows GUI dialog')
-  .option('-u, --use', 'Set this new vault as the default')
-  .action(async (vaultName, options) => {
-    await vaultCreateCommand(vaultName, options);
-  });
-
-const vaultCmd = program.command('vault').description('Manage Obsidian Vaults');
-
-vaultCmd
-  .command('create')
-  .description('Create and register a new Obsidian Vault')
-  .argument('[vaultName]', 'Name of the vault')
-  .option('-p, --path <path>', 'Custom directory path for vault')
-  .option('-b, --browse', 'Browse for vault folder with native Windows GUI dialog')
-  .option('-u, --use', 'Set this new vault as the default')
-  .action(async (vaultName, options) => {
-    await vaultCreateCommand(vaultName, options);
-  });
-
-vaultCmd
-  .command('list')
-  .description('List all registered Obsidian Vaults and bound projects')
-  .action(async () => {
-    await vaultListCommand();
-  });
-
-vaultCmd
-  .command('switch')
-  .description('Switch the active default Obsidian Vault')
-  .argument('[vaultName]', 'Name of the vault to set as default')
-  .action(async (vaultName) => {
-    await vaultSwitchCommand(vaultName);
-  });
-
-program
-  .command('prompt')
-  .description('Synthesize codebase context & copy high-grade master prompt to clipboard')
-  .argument('[task...]', 'Description of feature or task for AI agent')
-  .action(async (taskParts) => {
-    const task = taskParts && taskParts.length > 0 ? taskParts.join(' ') : undefined;
-    await promptCommand(task);
-  });
-
-program
-  .command('spec')
-  .description('Generate a production-grade Feature PRD in Obsidian Specs')
-  .argument('[featureName...]', 'Name of feature to architect')
-  .action(async (featureParts) => {
-    const feature = featureParts && featureParts.length > 0 ? featureParts.join(' ') : undefined;
-    await specCommand(feature);
-  });
-
-program
-  .command('audit')
-  .description('Run commercial readiness & quality audit (security, payments, UX, observability)')
-  .argument('[targetDir]', 'Project directory to audit (defaults to current dir)')
-  .action(async (targetDir) => {
-    await auditCommand(targetDir);
-  });
-
-program
-  .command('dev')
-  .description('Launch the auto-detected development server (npm, dotnet watch, artisan, flutter)')
-  .action(async () => {
-    await devCommand();
-  });
-
-program
-  .command('check')
-  .description('Run the auto-detected verification suite for the current project')
-  .action(async () => {
-    await checkCommand();
-  });
-
-program
-  .command('snap')
-  .description('Quickly log an architectural decision or lesson learned to Obsidian Memory Bank')
-  .argument('[message...]', 'Note or gotcha message to record')
-  .action(async (messageParts) => {
-    const message = messageParts && messageParts.length > 0 ? messageParts.join(' ') : undefined;
-    await snapCommand(message);
-  });
-
-program
-  .command('wrapup')
-  .description('Archive completed tasks from _Context.md to Memory Bank and prune to <= 60 lines')
-  .action(async () => {
-    await wrapupCommand();
-  });
-
-program
-  .command('showcase')
-  .description('Toggle or set showcase status for current project in portfolio')
-  .argument('[state]', 'on | off')
-  .action(async (state) => {
-    await showcaseCommand(state);
-  });
-
-program
-  .command('sync')
-  .description('Audit/repair NTFS directory junctions and publish showcase projects to portfolio')
-  .action(async () => {
-    await syncCommand();
-  });
-
-program
-  .command('watch')
-  .description('Live daemon watching Obsidian vault changes and auto-linking new project folders')
-  .option('-a, --auto-link', 'Automatically detect and wire newly created project folders in projectsRoot')
-  .action(async (options) => {
-    await watchCommand(options);
-  });
-
-program
-  .command('doctor')
-  .description('Multi-platform toolchain and environment diagnostic for vibe coding')
-  .action(async () => {
-    await doctorCommand();
-  });
-
-const skillCmd = program
-  .command('skill')
-  .description('Multi-target AI agent skill & MCP compiler with deterministic guardrails');
-
-skillCmd
-  .command('compile')
-  .description('Compile a Python, TypeScript, JS, or JSON script into multi-target AI skills')
-  .argument('[filePath]', 'Path to the source script')
-  .option('-t, --target <target>', 'Target output: antigravity | mcp | cursor | openai | all', 'all')
-  .option('-o, --out <dir>', 'Custom output directory')
-  .option('-b, --browse', 'Browse for source script with native Windows GUI dialog')
-  .option('-s, --save-vault', 'Save and index directly into current project Obsidian vault (.vault/Skills/)')
-  .action(async (filePath, options) => {
-    await skillCompileCommand(filePath, options);
-  });
-
-skillCmd
-  .command('create')
-  .description('Synthesize an AI agent skill suite from a natural language intent')
-  .argument('[intent...]', 'Description of the skill/tool behavior')
-  .option('-t, --target <target>', 'Target output: antigravity | mcp | cursor | openai | all', 'all')
-  .option('-o, --out <dir>', 'Custom output directory')
-  .action(async (intentParts, options) => {
-    const intent = intentParts && intentParts.length > 0 ? intentParts.join(' ') : undefined;
-    await skillCreateCommand(intent, options);
-  });
-
-skillCmd
-  .command('list')
-  .description('List installed AI agent skills and their active compilation targets')
-  .action(async () => {
-    await skillListCommand();
-  });
-
-skillCmd
-  .command('test')
-  .description('Run automated safety sandbox and attack verification tests on a skill')
-  .argument('[skillDir]', 'Path to the compiled skill folder')
-  .action(async (skillDir) => {
-    await skillTestCommand(skillDir);
-  });
-
-skillCmd
-  .command('install')
-  .description('1-click wire-up of skill into Claude Desktop, Antigravity, and Cursor')
-  .argument('[skillDir]', 'Path to the compiled skill folder')
-  .option('-a, --all', 'Install to all available client environments without prompting')
-  .action(async (skillDir, options) => {
-    await skillInstallCommand(skillDir, options);
-  });
-
-skillCmd
-  .command('from-api')
-  .description('Ingest OpenAPI/Swagger JSON or URL and compile guarded AI agent tools')
-  .argument('[specPathOrUrl]', 'Path or URL to OpenAPI / Swagger JSON specification')
-  .option('-t, --target <target>', 'Target output: antigravity | mcp | cursor | openai | all', 'all')
-  .option('-o, --out <dir>', 'Custom output directory')
-  .option('-b, --browse', 'Browse for specification file with native Windows GUI dialog')
-  .action(async (specPathOrUrl, options) => {
-    await skillFromApiCommand(specPathOrUrl, options);
-  });
-
-skillCmd
-  .command('audit')
-  .description('Run static security, schema quality, and guardrail audit on a skill')
-  .argument('[skillDir]', 'Path to the compiled skill folder or manifest')
-  .action(async (skillDir) => {
-    await skillAuditCommand(skillDir);
-  });
-
-program
-  .command('clarify')
-  .description('Interactive Principal Architect interview to eliminate vague requirements & output locked PRD')
-  .argument('[featureName...]', 'Feature or module to clarify')
-  .action(async (featureParts) => {
-    const feature = featureParts && featureParts.length > 0 ? featureParts.join(' ') : undefined;
-    await clarifyCommand(feature);
-  });
-
-program
-  .command('ship')
-  .description('Commercial launch gate & launchpad (secrets, GDPR legal suite, SEO, CI/CD, verification)')
-  .argument('[targetDir]', 'Project directory to audit for launch (defaults to current dir)')
-  .action(async (targetDir) => {
-    await shipCommand(targetDir);
+  .command('pack')
+  .description('Budget-capped AST & diff context packer for token economy')
+  .argument('[targetPattern]', 'File pattern or subdirectory to pack')
+  .option('-b, --budget <tokens>', 'Context budget ceiling in tokens', '4000')
+  .option('-d, --diff', 'Include git diff (HEAD) in Tier 1 context', true)
+  .option('-e, --error-log <path>', 'Path to error log for stack-trace context slicing')
+  .option('-c, --compress', 'Compress context by stripping comments and blank lines')
+  .option('-s, --signatures-only', 'Extract only exports, interfaces, and function signatures')
+  .option('-o, --out <file>', 'Custom output file path')
+  .action(async (targetPattern, options) => {
+    await packCommand(targetPattern, options);
   });
 
 program
@@ -497,105 +175,48 @@ program
   .argument('[intent...]', 'Task or intent to route to installed AI skills (.vault/Skills/ or ./skills/)')
   .option('-s, --server', 'Run OmniRoute as a stdio MCP Server multiplexer')
   .option('-d, --dry-run', 'Preview matched tools without executing')
+  .option('--status', 'Display free tier quota ledger table')
   .action(async (intentParts, options) => {
     const intent = intentParts && intentParts.length > 0 ? intentParts.join(' ') : undefined;
     await routeCommand(intent, options);
   });
 
 program
-  .command('checkpoint')
-  .description('Create an instant time-machine snapshot before AI agent edits')
-  .argument('[label...]', 'Checkpoint label or description')
-  .option('-l, --list', 'List stored checkpoints')
-  .action(async (labelParts, options) => {
-    const label = labelParts && labelParts.length > 0 ? labelParts.join(' ') : undefined;
-    await checkpointCommand(label, options);
+  .command('quota')
+  .description('Display zero-dollar free tier API quota ledger table')
+  .action(async () => {
+    await quotaCommand();
   });
 
 program
-  .command('rollback')
-  .description('Restore workspace files to a previous stable checkpoint')
-  .argument('[checkpointId]', 'ID of checkpoint to restore')
-  .action(async (checkpointId) => {
-    await rollbackCommand(checkpointId);
+  .command('models')
+  .description('Display verified 2026 zero-credit-card free model matrix')
+  .action(async () => {
+    await modelsCommand();
+  });
+
+// 2. Execution & Guardrails
+program
+  .command('micro')
+  .description('Small-model atomic micro-task decomposer with search-replace and verify loop')
+  .argument('[task...]', 'Task description to decompose for 3B–8B models')
+  .option('-v, --verify <cmd>', 'Verification command (default: tsc --noEmit)')
+  .option('-f, --file <file>', 'Target file to patch')
+  .option('-p, --patch <patch>', 'Search-replace patch file or text')
+  .action(async (taskParts, options) => {
+    const task = taskParts && taskParts.length > 0 ? taskParts.join(' ') : undefined;
+    await microCommand(task, options);
   });
 
 program
-  .command('rewind')
-  .description('1-click workspace undo & panic button: discard AI hallucinated changes and restore clean state')
-  .option('-h, --hard', 'Force reset all modified and untracked files without prompting')
-  .option('-c, --checkpoint', 'Restore the latest snapshot checkpoint')
-  .option('-d, --dry-run', 'Preview changes that would be discarded without modifying files')
-  .action(async (options) => {
-    await rewindCommand(options);
-  });
-
-program
-  .command('explain')
-  .description('Summarize uncommitted AI workspace changes and detect security risks or gotchas')
-  .option('-c, --copy', 'Copy Markdown summary directly to clipboard')
-  .option('-s, --save', 'Save explanation note into .vault/Explanations/')
-  .option('-j, --json', 'Output structured JSON explanation')
-  .action(async (options) => {
-    await explainCommand(options);
-  });
-
-program
-  .command('health')
-  .description('Evaluate AI readiness score (0-100), context token density, and run auto-repairs')
-  .option('-f, --fix', 'Automatically repair fixable context and template issues')
-  .option('-j, --json', 'Output structured JSON health report')
-  .action(async (options) => {
-    await healthCommand(options);
-  });
-
-program
-  .command('map')
-  .description('Extract codebase topology, AST exports, module dependencies, and API routes')
-  .argument('[targetDir]', 'Target project directory to analyze (defaults to current dir)')
-  .action(async (targetDir) => {
-    await mapCommand(targetDir);
-  });
-
-program
-  .command('monetize')
-  .description('Scaffold complete commercial Stripe subscriptions, webhooks, and pricing table')
-  .argument('[targetDir]', 'Target project directory to scaffold (defaults to current dir)')
-  .action(async (targetDir) => {
-    await monetizeCommand(targetDir);
-  });
-
-program
-  .command('mock')
-  .description('Launch instant zero-dependency local REST mock API server with CORS and latency simulation')
-  .argument('[dataFile]', 'Optional JSON data or OpenAPI file to seed mock endpoints')
-  .option('-p, --port <port>', 'Port number to listen on', '4000')
-  .option('-d, --delay <delayMs>', 'Simulated network latency in milliseconds', '0')
-  .option('-c, --chaos <rate>', 'Chaos error simulation rate (0.0 - 1.0)', '0')
-  .action(async (dataFile, options) => {
-    await mockCommand(dataFile, {
-      port: parseInt(options.port, 10),
-      delay: parseInt(options.delay, 10),
-      chaos: parseFloat(options.chaos),
-    });
-  });
-
-program
-  .command('db')
-  .description('Parse database schema (Prisma/SQL), generate ER diagram, and write table dictionary')
-  .argument('[targetDir]', 'Target project directory (defaults to current dir)')
-  .action(async (targetDir) => {
-    await dbCommand(targetDir);
-  });
-
-program
-  .command('pack')
-  .description('Compress source code into token-optimized AST signatures and copy dense context to clipboard')
-  .argument('[targetPattern]', 'File pattern or subdirectory to pack')
-  .option('-s, --signatures-only', 'Extract only exports, interfaces, and function signatures')
-  .option('-o, --out <file>', 'Custom output file path')
-  .action(async (targetPattern, options) => {
-    await packCommand(targetPattern, options);
+  .command('spec')
+  .description('Generate a production-grade Feature PRD in Obsidian Specs')
+  .argument('[featureName...]', 'Name of feature to architect')
+  .option('-c, --clarify', 'Interactive architectural interview before generating PRD')
+  .option('-p, --prompt', 'Synthesize codebase context and copy master prompt to clipboard')
+  .action(async (featureParts, options) => {
+    const feature = featureParts && featureParts.length > 0 ? featureParts.join(' ') : undefined;
+    await specCommand(feature, options);
   });
 
 program
@@ -608,6 +229,129 @@ program
   });
 
 program
+  .command('dev')
+  .description('Launch the auto-detected development server (npm, dotnet watch, artisan, flutter)')
+  .option('--lite', 'Run lightweight server without heavy watchers')
+  .action(async () => {
+    await devCommand();
+  });
+
+// 3. State & Memory
+program
+  .command('link')
+  .description('Auto-detect and wire a project codebase to an Obsidian Vault or portable memory bank')
+  .argument('[targetPath]', 'Path to the project folder to wire (optional)')
+  .option('-b, --browse', 'Browse for project folder with native Windows GUI dialog')
+  .option('-v, --vault <vaultName>', 'Target Obsidian Vault name')
+  .option('-s, --showcase', 'Mark project as showcase for portfolio')
+  .option('-f, --force', 'Force overwrite of existing notes')
+  .option('--portable', 'Use portable .vibe/memory/ copy-sync directory instead of junctions')
+  .option('--no-obsidian', 'Output standard Markdown links and Mermaid diagrams')
+  .action(async (targetPath, options) => {
+    await linkCommand(targetPath, options);
+  });
+
+const stateCmd = program
+  .command('state')
+  .description('Unified State & Memory Controller (save, restore, checkpoint, rewind)')
+  .argument('[action]', 'save | restore | list')
+  .argument('[arg]', 'Checkpoint label or ID')
+  .option('-l, --lesson <msg>', 'Log lesson note into Memory Bank')
+  .option('-r, --rewind', 'Discard uncommitted AI edits')
+  .option('-h, --hard', 'Force discard all uncommitted changes without prompt')
+  .action(async (action, arg, options) => {
+    await stateCommand(action, arg, options);
+  });
+
+stateCmd
+  .command('save')
+  .description('Save workspace state checkpoint or lesson note')
+  .argument('[label...]', 'Checkpoint label')
+  .option('-l, --lesson <msg>', 'Record lesson note to Lessons-and-Gotchas.md')
+  .action(async (labelParts, options) => {
+    const label = labelParts && labelParts.length > 0 ? labelParts.join(' ') : undefined;
+    await stateSaveCommand(label, options);
+  });
+
+stateCmd
+  .command('restore')
+  .description('Restore previous checkpoint or rewind changes')
+  .argument('[id]', 'Checkpoint ID to restore')
+  .option('-r, --rewind', 'Discard uncommitted changes')
+  .option('-h, --hard', 'Force discard uncommitted changes')
+  .action(async (id, options) => {
+    await stateRestoreCommand(id, options);
+  });
+
+program
+  .command('map')
+  .description('Extract codebase topology, AST exports, module dependencies, and API routes')
+  .argument('[targetDir]', 'Target project directory to analyze (defaults to current dir)')
+  .action(async (targetDir) => {
+    await mapCommand(targetDir);
+  });
+
+// 4. Student & Learning
+program
+  .command('explain')
+  .description('Summarize uncommitted AI workspace changes and detect security risks or gotchas')
+  .option('-c, --copy', 'Copy Markdown summary directly to clipboard')
+  .option('-s, --save', 'Save explanation note into .vault/Explanations/')
+  .option('-j, --json', 'Output structured JSON explanation')
+  .option('--last-commit', 'Analyze the last git commit (HEAD~1..HEAD)')
+  .option('--quiz', 'Generate 3 professor viva oral-defense questions')
+  .action(async (options) => {
+    await explainCommand(options);
+  });
+
+program
+  .command('learn')
+  .description('Oral-defense learning mode: digest last commit & generate 3 viva exam defense questions')
+  .action(async () => {
+    await learnCommand();
+  });
+
+program
+  .command('rubric')
+  .description('Score codebase against academic software engineering rubric criteria')
+  .action(async () => {
+    await rubricCommand();
+  });
+
+program
+  .command('wrapup')
+  .description('Archive completed tasks from _Context.md to Memory Bank and prune to <= 60 lines')
+  .option('--academic', 'Include academic study notes in session wrapup')
+  .action(async () => {
+    await wrapupCommand();
+  });
+
+program
+  .command('ship')
+  .description('Zero-credit-card student launch preflight (Vercel, Cloudflare, Render, Supabase)')
+  .argument('[targetDir]', 'Project directory to audit for launch (defaults to current dir)')
+  .option('--free', 'Perform zero-credit-card student deployment preflight', true)
+  .action(async (targetDir, options) => {
+    await shipCommand(targetDir, options);
+  });
+
+program
+  .command('doctor')
+  .description('Hardware-aware VRAM diagnostic and student setup doctor')
+  .option('--student', 'Check hardware RAM/VRAM and recommend exact Ollama quantizations', true)
+  .action(async (options) => {
+    await doctorCommand(options);
+  });
+
+// 5. Diagnostics & Stack Utilities
+program
+  .command('check')
+  .description('Run the auto-detected verification suite for the current project')
+  .action(async () => {
+    await checkCommand();
+  });
+
+program
   .command('env')
   .description('Audit environment files (.env vs .env.example), detect secret leaks, and sync keys')
   .option('-s, --sync', 'Automatically add missing keys to .env.example with placeholders')
@@ -617,19 +361,11 @@ program
   });
 
 program
-  .command('canvas')
-  .description('Generate native Obsidian 2D visual canvas connecting project hub, tasks, and architecture')
+  .command('db')
+  .description('Parse database schema (Prisma/SQL), generate ER diagram, and write table dictionary')
   .argument('[targetDir]', 'Target project directory (defaults to current dir)')
   .action(async (targetDir) => {
-    await canvasCommand(targetDir);
-  });
-
-program
-  .command('triage')
-  .description('Run verification suite, capture stack traces, and synthesize surgical fix prompts')
-  .argument('[customCommand]', 'Optional verification command to execute')
-  .action(async (customCommand) => {
-    await triageCommand(customCommand);
+    await dbCommand(targetDir);
   });
 
 program
@@ -650,6 +386,40 @@ program
   });
 
 program
+  .command('mock')
+  .description('Launch instant zero-dependency local REST mock API server with CORS and latency simulation')
+  .argument('[dataFile]', 'Optional JSON data or OpenAPI file to seed mock endpoints')
+  .option('-p, --port <port>', 'Port number to listen on', '4000')
+  .option('-d, --delay <delayMs>', 'Simulated network latency in milliseconds', '0')
+  .option('-c, --chaos <rate>', 'Chaos error simulation rate (0.0 - 1.0)', '0')
+  .action(async (dataFile, options) => {
+    await mockCommand(dataFile, {
+      port: parseInt(options.port, 10),
+      delay: parseInt(options.delay, 10),
+      chaos: parseFloat(options.chaos),
+    });
+  });
+
+program
+  .command('triage')
+  .description('Run verification suite, capture stack traces, and synthesize surgical fix prompts')
+  .argument('[customCommand]', 'Optional verification command to execute')
+  .action(async (customCommand) => {
+    await triageCommand(customCommand);
+  });
+
+program
+  .command('tunnel')
+  .description('Instant zero-config Cloudflare public bridge, terminal QR code, and Stripe webhook relay')
+  .argument('[port]', 'Local port to forward (auto-detects if omitted)')
+  .option('-p, --port <port>', 'Local port to forward')
+  .option('-s, --stripe', 'Display Stripe webhook forwarding instructions')
+  .option('--no-qr', 'Disable terminal QR code display')
+  .action(async (port, options) => {
+    await tunnelCommand(port, options);
+  });
+
+program
   .command('guide')
   .description('View in-terminal usage guides and workflow documentation')
   .argument('[topic]', 'Topic: quickstart | daily | architecture | topology | launch | skills | all')
@@ -667,15 +437,124 @@ program
     await rulesCommand(action, options);
   });
 
+// --- Silent Backwards-Compatible Aliases (Omitted from llms.txt & help) ---
 program
-  .command('tunnel')
-  .description('Instant zero-config Cloudflare public bridge, terminal QR code, and Stripe webhook relay')
-  .argument('[port]', 'Local port to forward (auto-detects if omitted)')
-  .option('-p, --port <port>', 'Local port to forward')
-  .option('-s, --stripe', 'Display Stripe webhook forwarding instructions')
-  .option('--no-qr', 'Disable terminal QR code display')
-  .action(async (port, options) => {
-    await tunnelCommand(port, options);
+  .command('snap', { hidden: true })
+  .description('Silent alias for vibe state save --lesson')
+  .argument('[message...]', 'Note or gotcha message to record')
+  .action(async (messageParts) => {
+    const message = messageParts && messageParts.length > 0 ? messageParts.join(' ') : undefined;
+    await snapCommand(message);
   });
+
+program
+  .command('checkpoint', { hidden: true })
+  .description('Silent alias for vibe state save')
+  .argument('[label...]', 'Checkpoint label')
+  .option('-l, --list', 'List stored checkpoints')
+  .action(async (labelParts, options) => {
+    const label = labelParts && labelParts.length > 0 ? labelParts.join(' ') : undefined;
+    await checkpointCommand(label, options);
+  });
+
+program
+  .command('rollback', { hidden: true })
+  .description('Silent alias for vibe state restore')
+  .argument('[checkpointId]', 'ID of checkpoint to restore')
+  .action(async (checkpointId) => {
+    await rollbackCommand(checkpointId);
+  });
+
+program
+  .command('rewind', { hidden: true })
+  .description('Silent alias for vibe state restore --rewind')
+  .option('-h, --hard', 'Force reset all modified and untracked files without prompting')
+  .option('-c, --checkpoint', 'Restore the latest snapshot checkpoint')
+  .option('-d, --dry-run', 'Preview changes that would be discarded without modifying files')
+  .action(async (options) => {
+    await rewindCommand(options);
+  });
+
+program
+  .command('clarify', { hidden: true })
+  .description('Silent alias for vibe spec --clarify')
+  .argument('[featureName...]', 'Feature or module to clarify')
+  .action(async (featureParts) => {
+    const feature = featureParts && featureParts.length > 0 ? featureParts.join(' ') : undefined;
+    await clarifyCommand(feature);
+  });
+
+program
+  .command('prompt', { hidden: true })
+  .description('Silent alias for vibe spec --prompt')
+  .argument('[task...]', 'Description of feature or task')
+  .action(async (taskParts) => {
+    const task = taskParts && taskParts.length > 0 ? taskParts.join(' ') : undefined;
+    await promptCommand(task);
+  });
+
+program
+  .command('monetize', { hidden: true })
+  .description('Deprecated: Scaffolds Stripe subscriptions')
+  .argument('[targetDir]', 'Target project directory')
+  .action(async (targetDir) => {
+    console.warn(pc.yellow('Notice: vibe monetize is deprecated. Zero-budget student edition recommends vibe ship --free.'));
+    await monetizeCommand(targetDir);
+  });
+
+// Supporting vault & skill subcommands
+const vaultCmd = program.command('vault', { hidden: true }).description('Manage Obsidian Vaults');
+vaultCmd.command('create').argument('[vaultName]').option('-p, --path <path>').option('-u, --use').action(vaultCreateCommand);
+vaultCmd.command('list').action(vaultListCommand);
+vaultCmd.command('switch').argument('[vaultName]').action(vaultSwitchCommand);
+
+const skillCmd = program.command('skill', { hidden: true }).description('Manage Skills');
+skillCmd.command('compile').argument('[filePath]').action(skillCompileCommand);
+skillCmd.command('create').argument('[intent...]').action(async (parts, opts) => {
+  const intent = parts && parts.length > 0 ? parts.join(' ') : undefined;
+  await skillCreateCommand(intent, opts);
+});
+skillCmd.command('list').action(skillListCommand);
+skillCmd.command('test').argument('[skillDir]').action(skillTestCommand);
+skillCmd.command('install').argument('[skillDir]').action(skillInstallCommand);
+skillCmd.command('from-api').argument('[spec]').action(skillFromApiCommand);
+skillCmd.command('audit').argument('[skillDir]').action(skillAuditCommand);
+
+program
+  .command('scan', { hidden: true })
+  .argument('[rootDir]')
+  .action(scanCommand);
+
+program
+  .command('init', { hidden: true })
+  .argument('[projectName]')
+  .action(initCommand);
+
+program
+  .command('sync', { hidden: true })
+  .action(syncCommand);
+
+program
+  .command('watch', { hidden: true })
+  .action(watchCommand);
+
+program
+  .command('health', { hidden: true })
+  .action(healthCommand);
+
+program
+  .command('canvas', { hidden: true })
+  .argument('[targetDir]')
+  .action(canvasCommand);
+
+program
+  .command('audit', { hidden: true })
+  .argument('[targetDir]')
+  .action(auditCommand);
+
+program
+  .command('showcase', { hidden: true })
+  .argument('[state]')
+  .action(showcaseCommand);
 
 program.parse();

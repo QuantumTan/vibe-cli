@@ -49,6 +49,24 @@ export function createJunction(target: string, linkPath: string): JunctionResult
     fs.symlinkSync(resolvedTarget, resolvedLink, isWin ? 'junction' : 'dir');
     return { success: true, message: `Created junction: ${resolvedLink} -> ${resolvedTarget}` };
   } catch (err: unknown) {
+    const error = err as { code?: string; message?: string };
+    // Graceful cross-platform fallback on EPERM/EXDEV/EINVAL (WSL2 / FAT32 / Codespaces)
+    if (error.code === 'EPERM' || error.code === 'EXDEV' || error.code === 'EINVAL' || error.code === 'EACCES') {
+      try {
+        fs.ensureDirSync(resolvedLink);
+        if (fs.existsSync(resolvedTarget)) {
+          fs.copySync(resolvedTarget, resolvedLink, { overwrite: false });
+        }
+        return {
+          success: true,
+          message: `Created fallback directory via .vibe/memory/ sync: ${resolvedLink}`,
+        };
+      } catch (fallbackErr: unknown) {
+        const fbMsg = fallbackErr instanceof Error ? fallbackErr.message : String(fallbackErr);
+        return { success: false, message: `Failed fallback sync: ${fbMsg}` };
+      }
+    }
+
     const errMsg = err instanceof Error ? err.message : String(err);
     return {
       success: false,

@@ -4,6 +4,10 @@ import * as p from '@clack/prompts';
 import pc from 'picocolors';
 import { copyToClipboard } from './prompt.js';
 import { collectSourceFiles } from './map.js';
+import { estimateTokens } from '../utils/token-estimator.js';
+import { assembleTieredContext, compressContext, extractSignatures } from '../core/ast-packer.js';
+
+export { estimateTokens };
 
 export interface PackedFile {
   relPath: string;
@@ -21,6 +25,17 @@ export interface PackResult {
   files: PackedFile[];
 }
 
+export interface PackOptions {
+  signaturesOnly?: boolean;
+  clipboard?: boolean;
+  out?: string;
+  budget?: number | string;
+  diff?: boolean;
+  errorLog?: string;
+  compress?: boolean;
+  cached?: boolean;
+}
+
 /**
  * Strips verbose comments, multi-line blocks, and excessive whitespace.
  */
@@ -31,63 +46,14 @@ export function minifySource(content: string, signaturesOnly = false): string {
   stripped = stripped.replace(/^\s*\/\/.*$/gm, '');
 
   if (signaturesOnly) {
-    // If signatures only, extract export statements, types, interfaces, and function headers without bodies
-    const lines = stripped.split('\n');
-    const signatureLines: string[] = [];
-    let insideFnBody = false;
-    let braceDepth = 0;
-
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed) continue;
-
-      // Retain imports, type definitions, interfaces, exports
-      if (
-        trimmed.startsWith('import ') ||
-        trimmed.startsWith('export type ') ||
-        trimmed.startsWith('export interface ') ||
-        trimmed.startsWith('type ') ||
-        trimmed.startsWith('interface ')
-      ) {
-        signatureLines.push(trimmed);
-        continue;
-      }
-
-      // If function definition
-      if (
-        (trimmed.startsWith('export function ') ||
-          trimmed.startsWith('export async function ') ||
-          trimmed.startsWith('function ') ||
-          trimmed.startsWith('def ')) &&
-        trimmed.includes('(')
-      ) {
-        const header = trimmed.replace(/\{.*$/, '').trim();
-        signatureLines.push(`${header};`);
-        continue;
-      }
-
-      // If class definition
-      if (trimmed.startsWith('export class ') || trimmed.startsWith('class ')) {
-        const header = trimmed.replace(/\{.*$/, '').trim();
-        signatureLines.push(`${header} { ... }`);
-        continue;
-      }
-    }
-
-    if (signatureLines.length > 0) {
-      return signatureLines.join('\n');
+    const sigs = extractSignatures(stripped);
+    if (sigs.trim().length > 0) {
+      return sigs;
     }
   }
 
   // Remove redundant empty lines
   return stripped.replace(/\n\s*\n\s*\n/g, '\n\n').trim();
-}
-
-/**
- * Estimates LLM token count from string length (~4 chars per token).
- */
-export function estimateTokens(text: string): number {
-  return Math.ceil(text.length / 4);
 }
 
 /**
@@ -127,11 +93,12 @@ export async function packSourceFiles(
     }
   }
 
-  const originalTokens = estimateTokens(totalOrigChars.toString().repeat(Math.ceil(totalOrigChars / 10)));
   const actualOrigTokens = Math.ceil(totalOrigChars / 4);
-  const packedTokens = Math.ceil(totalPackedChars / 4);
+  const packedTokens = estimateTokens(
+    packedFiles.map((f) => f.content).join('\n')
+  );
   const savingsPercent =
-    actualOrigTokens > 0 ? Math.round(((actualOrigTokens - packedTokens) / actualOrigTokens) * 100) : 0;
+    actualOrigTokens > 0 ? Math.max(0, Math.round(((actualOrigTokens - packedTokens) / actualOrigTokens) * 100)) : 0;
 
   // Build markdown context payload
   const dateStr = new Date().toISOString().substring(0, 10);
@@ -165,23 +132,57 @@ export async function packSourceFiles(
  */
 export async function packCommand(
   targetPatternInput?: string,
-  options: { signaturesOnly?: boolean; clipboard?: boolean; out?: string } = {}
+  options: PackOptions = {}
 ): Promise<void> {
   const cwd = process.cwd();
   p.intro(pc.bgMagenta(pc.black(' vibe pack ')) + ' ' + pc.bold('Token-Optimized AI Context Packer'));
 
+  const budgetNum = options.budget ? parseInt(options.budget.toString(), 10) : 4000;
+  const isTieredMode = options.diff || options.errorLog || options.budget || options.compress;
+
   const s = p.spinner();
   s.start('Collecting source files and compressing AST / token payload...');
 
-  const result = await packSourceFiles(cwd, targetPatternInput, options.signaturesOnly);
+  let payload = '';
+  let packedTokens = 0;
+  let fileCount = 0;
+  let savingsInfo = '';
 
-  if (result.totalFiles === 0) {
-    s.stop(pc.yellow('No source files found to pack.'));
-    p.outro('Context pack empty.');
-    return;
+  if (isTieredMode) {
+    const allFiles = await collectSourceFiles(cwd);
+    const sourceFiles = targetPatternInput
+      ? allFiles.filter((f) => f.includes(targetPatternInput.replace(/\\/g, '/')))
+      : allFiles.slice(0, 25);
+
+    const tiered = await assembleTieredContext(cwd, {
+      budget: budgetNum,
+      diff: options.diff !== false,
+      errorLog: options.errorLog,
+      compress: options.compress,
+      cached: options.cached,
+      sourceFiles,
+    });
+
+    payload = tiered.fullPayload;
+    packedTokens = tiered.totalTokens;
+    fileCount = sourceFiles.length;
+    savingsInfo = `Budget: ~${packedTokens} / ${budgetNum} tokens (Tier 1: ${tiered.tier1Tokens}, Tier 2: ${tiered.tier2Tokens}, Tier 3: ${tiered.tier3Tokens})`;
+  } else {
+    const result = await packSourceFiles(cwd, targetPatternInput, options.signaturesOnly);
+
+    if (result.totalFiles === 0) {
+      s.stop(pc.yellow('No source files found to pack.'));
+      p.outro('Context pack empty.');
+      return;
+    }
+
+    payload = result.payload;
+    packedTokens = result.packedTokens;
+    fileCount = result.totalFiles;
+    savingsInfo = `~${result.packedTokens} tokens (Saved ${result.savingsPercent}%)`;
   }
 
-  s.stop(pc.green(`Packed ${result.totalFiles} file(s)! (~${result.packedTokens} tokens, saved ${result.savingsPercent}%)`));
+  s.stop(pc.green(`Packed context ready! (${savingsInfo})`));
 
   // Determine save location
   const vaultPackDir = path.join(cwd, '.vault', 'Context-Packs');
@@ -190,17 +191,17 @@ export async function packCommand(
 
   const packFileName = `Pack-${Date.now()}.md`;
   const outFile = options.out ? path.resolve(options.out) : path.join(targetDir, packFileName);
-  await fs.writeFile(outFile, result.payload, 'utf8');
+  await fs.writeFile(outFile, payload, 'utf8');
 
   // Copy to clipboard if requested or default
-  const copied = await copyToClipboard(result.payload);
+  const copied = await copyToClipboard(payload);
 
   p.note(
-    `Files Packed:    ${pc.bold(pc.cyan(result.totalFiles.toString()))} file(s)\n` +
-      `Est. Tokens:     ${pc.bold(pc.green(`~${result.packedTokens}`))} (Saved ${pc.bold(pc.yellow(`${result.savingsPercent}%`))})\n` +
+    `Files / Targets:  ${pc.bold(pc.cyan(fileCount.toString()))} target(s)\n` +
+      `Est. Tokens:     ${pc.bold(pc.green(`~${packedTokens}`))} / ${budgetNum} cap\n` +
       `Saved Payload:   ${pc.white(outFile)}\n` +
-      `Clipboard:       ${copied ? pc.green('✔ Copied to Windows Clipboard!') : pc.dim('Clipboard unavailable')}\n\n` +
-      `Ready to paste into Antigravity, Cursor, or Claude prompt without context bloat!`,
+      `Clipboard:       ${copied ? pc.green('✔ Copied to Clipboard!') : pc.dim('Clipboard unavailable')}\n\n` +
+      `Budget-capped context fits within Groq (6k TPM) and GitHub Models (8k cap)!`,
     'Context Pack Ready'
   );
 

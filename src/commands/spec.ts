@@ -4,6 +4,13 @@ import matter from 'gray-matter';
 import * as p from '@clack/prompts';
 import pc from 'picocolors';
 import { slugify } from './sync.js';
+import { clarifyCommand } from './clarify.js';
+import { promptCommand } from './prompt.js';
+
+export interface SpecOptions {
+  clarify?: boolean;
+  prompt?: boolean;
+}
 
 export function generateFeatureSpecMarkdown(featureName: string, projectName: string): string {
   const timestamp = new Date().toISOString().substring(0, 10);
@@ -73,7 +80,16 @@ interface ${featureName.replace(/\s+/g, '')}Payload {
 `;
 }
 
-export async function specCommand(featureNameInput?: string): Promise<void> {
+export async function specCommand(featureNameInput?: string, options: SpecOptions = {}): Promise<void> {
+  if (options.clarify) {
+    await clarifyCommand(featureNameInput);
+    return;
+  }
+  if (options.prompt) {
+    await promptCommand(featureNameInput);
+    return;
+  }
+
   const cwd = process.cwd();
   const vaultDir = path.join(cwd, '.vault');
   const specsDir = path.join(vaultDir, 'Specs');

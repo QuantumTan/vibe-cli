@@ -13,6 +13,7 @@ import {
 } from '../templates.js';
 import { createJunction, updateGitExclude, checkEnvHealth } from '../junction.js';
 import { promptOrSelectVault } from './vault.js';
+import { createSafeLink } from '../utils/fs-link.js';
 import type { RegisteredProject } from '../types.js';
 
 export interface LinkOptions {
@@ -20,12 +21,14 @@ export interface LinkOptions {
   vault?: string;
   showcase?: boolean;
   force?: boolean;
+  portable?: boolean;
+  noObsidian?: boolean;
 }
 
 export async function linkProjectPipeline(
   targetDir: string,
   vaultName: string,
-  options: { showcase?: boolean; force?: boolean } = {}
+  options: { showcase?: boolean; force?: boolean; portable?: boolean; noObsidian?: boolean } = {}
 ): Promise<{ success: boolean; project?: RegisteredProject; error?: string }> {
   try {
     const config = loadConfig();
@@ -48,12 +51,12 @@ export async function linkProjectPipeline(
       config.registeredProjects.filter((p) => p.vault === vaultName)
     );
 
-    // 3. Create NTFS Junctions
+    // 3. Create Links (Junction / Symlink / Portable Copy-Sync)
     const vaultProjectDir = path.join(vaultPath, '02-Projects', meta.name);
     const vaultGlobalDir = path.join(vaultPath, '00-Global-Rules');
 
-    const linkVault = createJunction(vaultProjectDir, path.join(targetDir, '.vault'));
-    const linkGlobal = createJunction(vaultGlobalDir, path.join(targetDir, '.vault-global'));
+    const linkVault = createSafeLink(vaultProjectDir, path.join(targetDir, '.vault'), { portable: options.portable });
+    const linkGlobal = createSafeLink(vaultGlobalDir, path.join(targetDir, '.vault-global'), { portable: options.portable });
 
     if (!linkVault.success) {
       return { success: false, error: linkVault.message };
