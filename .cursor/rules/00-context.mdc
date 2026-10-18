@@ -1,0 +1,23 @@
+---
+description: Active Project Context & Sliding Window Objectives
+globs: *
+alwaysApply: true
+---
+# Active Project Context for vibe-cli
+
+> **Category**: Web App | **Stack**: TypeScript
+> **Summary**: > **Automated Multi-Vault Obsidian Orchestrator, Auto-Discovery Engine & Vibe Coding Assistant**
+
+## Current Objective
+- Dual Power Stack implemented & verified: `vibe rules` (universal cross-agent rules sync & prompt-cache architect) and `vibe tunnel` (instant public bridge, terminal QR code & Stripe webhook relay).
+
+## Active Tasks
+  - [x] Implement `vibe rules` with glob-scoping and KV-cache prefix structure
+  - [x] Implement `vibe tunnel` with Cloudflare quick tunnels, port auto-detection & terminal QR codes
+  - [x] Add comprehensive vitest suites for rules and tunnel (16 test files, 90 tests passing)
+  - [x] Wire commands into interactive TUI menu and Commander CLI
+
+## Agent Directives
+- Read `.vault/_Context.md` to understand current objectives before modifying files.
+- Keep all modifications aligned with the active tasks.
+- Verify changes with `npm run build` before finishing.

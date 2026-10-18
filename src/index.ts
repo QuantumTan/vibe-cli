@@ -37,6 +37,8 @@ import { triageCommand } from './commands/triage.js';
 import { apiCommand } from './commands/api.js';
 import { depsCommand } from './commands/deps.js';
 import { guideCommand } from './commands/guide.js';
+import { rulesCommand } from './commands/rules.js';
+import { tunnelCommand } from './commands/tunnel.js';
 import {
   skillCompileCommand,
   skillCreateCommand,
@@ -108,6 +110,7 @@ export async function interactiveMainMenu(): Promise<void> {
           { value: 'rewind', label: '1-click AI panic undo (rewind)', hint: 'vibe rewind' },
           { value: 'checkpoint', label: 'Create snapshot checkpoint', hint: 'vibe checkpoint' },
           { value: 'rollback', label: 'Rollback to checkpoint', hint: 'vibe rollback' },
+          { value: 'rules', label: 'Cross-agent rules sync (Cursor/Claude/Windsurf)', hint: 'vibe rules' },
           { value: 'back', label: 'Back to main menu' },
         ],
       });
@@ -122,6 +125,7 @@ export async function interactiveMainMenu(): Promise<void> {
       if (sub === 'rewind') { await rewindCommand(); continue; }
       if (sub === 'checkpoint') { await checkpointCommand(); continue; }
       if (sub === 'rollback') { await rollbackCommand(); continue; }
+      if (sub === 'rules') { await rulesCommand(); continue; }
     }
 
     if (action === 'topology') {
@@ -146,6 +150,7 @@ export async function interactiveMainMenu(): Promise<void> {
         options: [
           { value: 'ship', label: 'Pre-flight release checks', hint: 'vibe ship' },
           { value: 'monetize', label: 'Scaffold Stripe billing', hint: 'vibe monetize' },
+          { value: 'tunnel', label: 'Instant public tunnel & webhook relay', hint: 'vibe tunnel' },
           { value: 'mock', label: 'Start local mock API', hint: 'vibe mock' },
           { value: 'env', label: 'Check environment variables', hint: 'vibe env' },
           { value: 'commit', label: 'Create conventional commit', hint: 'vibe commit' },
@@ -157,6 +162,7 @@ export async function interactiveMainMenu(): Promise<void> {
       if (p.isCancel(sub) || sub === 'back') continue;
       if (sub === 'ship') { await shipCommand(); continue; }
       if (sub === 'monetize') { await monetizeCommand(); continue; }
+      if (sub === 'tunnel') { await tunnelCommand(); continue; }
       if (sub === 'mock') { await mockCommand(); continue; }
       if (sub === 'env') { await envCommand(); continue; }
       if (sub === 'commit') { await commitCommand(); continue; }
@@ -649,6 +655,27 @@ program
   .argument('[topic]', 'Topic: quickstart | daily | architecture | topology | launch | skills | all')
   .action(async (topic) => {
     await guideCommand(topic);
+  });
+
+program
+  .command('rules')
+  .description('Universal Cross-Agent Rules & Prompt-Cache Architect (Cursor, Claude Code, Windsurf, Copilot)')
+  .argument('[action]', 'Action: sync | check | clean', 'sync')
+  .option('-t, --target <target>', 'Target: all | cursor | claude | windsurf | copilot | agents', 'all')
+  .option('-d, --dry-run', 'Preview rule files without writing')
+  .action(async (action, options) => {
+    await rulesCommand(action, options);
+  });
+
+program
+  .command('tunnel')
+  .description('Instant zero-config Cloudflare public bridge, terminal QR code, and Stripe webhook relay')
+  .argument('[port]', 'Local port to forward (auto-detects if omitted)')
+  .option('-p, --port <port>', 'Local port to forward')
+  .option('-s, --stripe', 'Display Stripe webhook forwarding instructions')
+  .option('--no-qr', 'Disable terminal QR code display')
+  .action(async (port, options) => {
+    await tunnelCommand(port, options);
   });
 
 program.parse();

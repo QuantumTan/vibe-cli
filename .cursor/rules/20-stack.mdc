@@ -1,0 +1,17 @@
+---
+description: Codebase Architecture, Types & Verification
+globs: **/*.{ts,tsx,js,jsx}
+alwaysApply: false
+---
+# Technical Standards for vibe-cli
+
+## Toolchain & Verification
+- **Verification Command**: `npm run build`
+- **Development Server**: `npm run dev`
+- **Tech Stack**: TypeScript
+
+## Code Quality Standards
+- **Strict Contracts**: Ensure all public interfaces, models, and return types are strongly typed.
+- **Responsive & Accessible**: Adhere to WCAG contrast standards and responsive layout principles.
+- **Defensive Error Handling**: Catch and handle potential null/undefined values; fail gracefully with descriptive error messages.
+- **Verification Rule**: Always run `npm run build` before completing changes.

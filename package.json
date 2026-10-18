@@ -53,11 +53,13 @@
     "commander": "^12.1.0",
     "fs-extra": "^11.2.0",
     "gray-matter": "^4.0.3",
-    "picocolors": "^1.1.0"
+    "picocolors": "^1.1.0",
+    "qrcode-terminal": "^0.12.0"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^20.14.9",
+    "@types/qrcode-terminal": "^0.12.2",
     "tsup": "^8.1.0",
     "typescript": "^5.5.2",
     "vitest": "^2.0.0"
